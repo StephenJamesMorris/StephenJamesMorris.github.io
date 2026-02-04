@@ -52,10 +52,73 @@
             transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        h1, h2, h3, .nav-item, .lang-toggle, .mobile-nav-item, .theme-toggle, .footer-brand {
+        h1, h2, h3, .nav-item, .lang-toggle, .mobile-nav-item, .theme-toggle, .footer-brand, .loader-text {
             font-family: 'Cinzel', serif;
         }
 
+        /* --- Loading Screen Styles --- */
+        #loader-wrapper {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-deep);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.8s;
+        }
+
+        #loader-wrapper.loaded {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-content {
+            position: relative;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 2rem;
+        }
+
+        .loader-logo-container {
+            position: relative;
+            width: 120px; height: 120px;
+        }
+
+        .loader-logo-img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 15px var(--accent-glow));
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .loader-circle {
+            position: absolute;
+            top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border: 2px solid transparent;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .loader-progress-text {
+            font-size: 10px;
+            letter-spacing: 0.5em;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Scroll & UI Elements --- */
         #scroll-progress {
             position: fixed;
             top: 0; left: 0; height: 3px;
@@ -156,7 +219,6 @@
             padding: 4px 12px; border-radius: 6px; font-size: 10px;
             text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;
         }
-        .light-mode .skill-tag { background: rgba(146, 64, 14, 0.05); border: 1px solid rgba(146, 64, 14, 0.1); }
 
         .profile-image-container {
             position: relative; border-radius: 1.5rem; overflow: hidden;
@@ -172,6 +234,19 @@
 </head>
 <body class="antialiased">
 
+    <!-- Loading Screen -->
+    <div id="loader-wrapper">
+        <div class="loader-content">
+            <div class="loader-logo-container">
+                <div class="loader-circle"></div>
+                <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="SJM" class="loader-logo-img">
+            </div>
+            <div class="loader-progress-text">
+                <span id="loader-percent">0</span>% Initializing
+            </div>
+        </div>
+    </div>
+
     <div id="scroll-progress"></div>
 
     <div id="parallax-container">
@@ -184,14 +259,12 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
     </button>
 
-    <!-- Navigation Bar -->
     <nav class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-6xl px-6">
         <div class="glass-panel rounded-full px-6 md:px-10 py-2.5 md:py-3.5 flex items-center justify-between">
             <div class="flex items-center">
                 <a href="#origins" class="outline-none group flex items-center gap-3">
                     <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="logo-img">
-                    <!-- sjm.dev text is hidden on md screens (wide view) and up -->
-                    <div class="hidden sm:block md:hidden text-xl font-bold tracking-[0.2em] accent-glow">sjm.dev</div>
+                    <div class="hidden sm:block text-xl font-bold tracking-[0.2em] accent-glow">sjm.dev</div>
                 </a>
             </div>
 
@@ -203,14 +276,10 @@
                 <a href="#arsenal" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-arsenal">Arsenal</a>
                 <a href="#projects" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-works">Works</a>
                 <a href="#contact" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-contact">Contact</a>
-
                 <div class="h-5 w-[1px] bg-white/10 mx-1"></div>
-
                 <div class="flex items-center gap-1.5">
                     <button onclick="toggleTheme()" class="theme-toggle p-2 hover:scale-110 transition-transform outline-none">
-                        <svg id="theme-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
-                        </svg>
+                        <svg id="theme-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                     </button>
                     <button onclick="toggleLanguage()" class="lang-toggle text-[10px] uppercase tracking-[0.2em] font-bold outline-none min-w-[30px]" id="langBtn">DE</button>
                 </div>
@@ -219,9 +288,7 @@
             <div class="flex md:hidden items-center gap-3">
                 <button onclick="toggleTheme()" class="p-2 outline-none"><svg id="theme-icon-mobile" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg></button>
                 <button onclick="toggleLanguage()" class="lang-toggle text-[10px] uppercase tracking-[0.2em] font-bold outline-none" id="langBtnMobile">DE</button>
-                <button onclick="toggleMobileMenu()" class="outline-none">
-                    <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
+                <button onclick="toggleMobileMenu()" class="outline-none"><svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg></button>
             </div>
         </div>
     </nav>
@@ -299,15 +366,12 @@
                     <p class="text-base leading-relaxed text-[var(--text-main)] font-medium mb-4" data-i18n="about-text-p1">
                         With over a decade of experience in IT operations and project management, I’ve navigated corporate environments while maintaining a deep passion for digital art.
                     </p>
-                    <p class="text-sm leading-relaxed text-[var(--text-muted)] font-semibold" data-i18n="about-text-p2">
-                        My work is driven by structural precision and creative exploration.
-                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Chronicle Section -->
+    <!-- Chronicle -->
     <section id="cv" class="py-24 px-4 max-w-5xl mx-auto relative">
         <div class="flex items-center gap-4 mb-20 justify-center text-center">
             <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
@@ -317,7 +381,6 @@
 
         <div class="relative">
             <div class="timeline-line"></div>
-            
             <div class="mb-16 flex flex-col md:flex-row items-center w-full">
                 <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2018 — 2026</span></div>
                 <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] shadow-[0_0_15px_var(--accent)] border-4 border-[var(--bg-deep)]"></div>
@@ -329,7 +392,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full">
                 <div class="hidden md:block w-1/2 pl-12 text-left"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2016 — 2017</span></div>
                 <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-60 border-4 border-[var(--bg-deep)]"></div>
@@ -341,7 +403,6 @@
                     </div>
                 </div>
             </div>
-            
             <div class="mb-16 flex flex-col md:flex-row items-center w-full">
                 <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2015 — 2017</span></div>
                 <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-50 border-4 border-[var(--bg-deep)]"></div>
@@ -353,7 +414,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full">
                 <div class="hidden md:block w-1/2 pl-12 text-left"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2013 — 2014</span></div>
                 <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-40 border-4 border-[var(--bg-deep)]"></div>
@@ -365,7 +425,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="mb-16 flex flex-col md:flex-row items-center w-full">
                 <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2012 — 2013</span></div>
                 <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-30 border-4 border-[var(--bg-deep)]"></div>
@@ -380,37 +439,36 @@
         </div>
     </section>
 
-    <!-- Academy Section -->
+    <!-- Academy -->
     <section id="academy" class="py-24 px-4 max-w-6xl mx-auto relative">
         <div class="flex items-center gap-4 mb-20 justify-center text-center">
             <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
             <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="nav-academy">The Academy</h2>
             <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="glass-card p-8 rounded-3xl h-full border-t-2 border-t-[var(--accent)]/30 text-center">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div class="glass-card p-8 rounded-3xl h-full border-t-2 border-t-[var(--accent)]/30">
                 <h3 class="text-lg font-bold uppercase mb-2 tracking-wider" data-i18n="edu1-title">Web Business Management</h3>
                 <p class="text-sm opacity-70 mb-4">Diploma, Webmasters Europe e.V.</p>
             </div>
-            <div class="glass-card p-8 rounded-3xl h-full text-center">
+            <div class="glass-card p-8 rounded-3xl h-full">
                 <h3 class="text-lg font-bold uppercase mb-2 tracking-wider" data-i18n="edu2-title">Online Marketing Manager</h3>
                 <p class="text-sm opacity-70 mb-4">Certificate, Webmasters Europe e.V.</p>
             </div>
-            <div class="glass-card p-8 rounded-3xl h-full text-center">
+            <div class="glass-card p-8 rounded-3xl h-full">
                 <h3 class="text-lg font-bold uppercase mb-2 tracking-wider" data-i18n="edu3-title">Web Interface Designer</h3>
                 <p class="text-sm opacity-70 mb-4">Certificate, Webmasters Europe e.V.</p>
             </div>
         </div>
     </section>
 
-    <!-- Arsenal Section -->
+    <!-- Arsenal -->
     <section id="arsenal" class="py-24 px-4 max-w-6xl mx-auto relative">
         <div class="flex items-center gap-4 mb-20 justify-center text-center">
             <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
             <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="nav-arsenal">The Arsenal</h2>
             <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
         </div>
-        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="glass-card p-8 rounded-3xl">
                 <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat1">Creative Technologist</h3>
@@ -427,32 +485,25 @@
             <div class="glass-card p-8 rounded-3xl">
                 <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat3">Design & Commerce</h3>
                 <div class="flex flex-wrap gap-3">
-                    <span class="skill-tag">UI/UX Design</span><span class="skill-tag">Web Architecture</span><span class="skill-tag">PrestaShop</span><span class="skill-tag">Webmasters Europe</span><span class="skill-tag">Online Marketing</span><span class="skill-tag">Web Analytics</span><span class="skill-tag">Branding</span><span class="skill-tag">Responsive Design</span>
+                    <span class="skill-tag">UI/UX Design</span><span class="skill-tag">Web Architecture</span><span class="skill-tag">PrestaShop</span><span class="skill-tag">Online Marketing</span><span class="skill-tag">Branding</span><span class="skill-tag">Responsive Design</span>
                 </div>
             </div>
             <div class="glass-card p-8 rounded-3xl">
                 <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat4">Legacy & Artifacts</h3>
                 <div class="flex flex-wrap gap-3">
-                    <span class="skill-tag">C++</span><span class="skill-tag">Server Admin</span><span class="skill-tag">Hardware Mgmt</span><span class="skill-tag">Helpdesk Ops</span><span class="skill-tag">Print Media</span><span class="skill-tag">Quality Control</span><span class="skill-tag">System Coordination</span>
+                    <span class="skill-tag">C++</span><span class="skill-tag">Server Admin</span><span class="skill-tag">Hardware Mgmt</span><span class="skill-tag">Helpdesk Ops</span><span class="skill-tag">Print Media</span><span class="skill-tag">Quality Control</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer Section -->
+    <!-- Footer -->
     <footer id="contact" class="py-32 px-4 text-center border-t border-[var(--glass-border)] bg-black/5">
         <a href="#origins" class="inline-block group mb-8">
-            <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" 
-                 alt="sjm logo" 
-                 class="h-24 md:h-32 w-auto mx-auto drop-shadow-2xl transition-all duration-500 group-hover:scale-110">
+            <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="h-24 md:h-32 w-auto mx-auto drop-shadow-2xl transition-all duration-500 group-hover:scale-110">
         </a>
-        
-        <div class="footer-brand text-3xl md:text-5xl font-bold tracking-[0.6em] text-[var(--accent)] mb-12 uppercase italic transform -translate-y-2">
-            SJM.DEV
-        </div>
-
+        <div class="footer-brand text-3xl md:text-5xl font-bold tracking-[0.6em] text-[var(--accent)] mb-12 uppercase italic transform -translate-y-2">SJM.DEV</div>
         <div class="flex flex-wrap justify-center gap-6 md:gap-10 mb-12">
-            <!-- Updated Social Links -->
             <a href="https://stephenjamesmorris.github.io" target="_blank" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                 <span>GitHub</span>
@@ -498,6 +549,30 @@
         let currentLang = 'en';
         let isDarkMode = true;
 
+        // --- Loader Logic ---
+        function initLoader() {
+            let percent = 0;
+            const textEl = document.getElementById('loader-percent');
+            const interval = setInterval(() => {
+                percent += Math.floor(Math.random() * 15) + 5;
+                if (percent >= 100) {
+                    percent = 100;
+                    clearInterval(interval);
+                }
+                textEl.innerText = percent;
+            }, 100);
+
+            window.onload = () => {
+                setTimeout(() => {
+                    clearInterval(interval);
+                    textEl.innerText = "100";
+                    document.getElementById('loader-wrapper').classList.add('loaded');
+                }, 500);
+            };
+        }
+        initLoader();
+
+        // --- Constellation Logic ---
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let nodes = [];
@@ -561,6 +636,7 @@
         window.addEventListener('resize', initNodes);
         initNodes(); animate();
 
+        // --- UI Logic ---
         function toggleTheme() {
             isDarkMode = !isDarkMode; document.body.classList.toggle('light-mode');
             const sunIcon = `<path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" />`;
