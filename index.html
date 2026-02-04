@@ -31,6 +31,8 @@
             --glass: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.1);
             --overlay: rgba(0, 0, 0, 0.95);
+            --geom-line-alpha: 0.2;
+            --geom-node-alpha: 0.4;
         }
 
         .light-mode {
@@ -42,6 +44,8 @@
             --glass: rgba(15, 23, 42, 0.04);
             --glass-border: rgba(15, 23, 42, 0.12);
             --overlay: rgba(255, 255, 255, 0.98);
+            --geom-line-alpha: 0.5;
+            --geom-node-alpha: 0.8;
         }
 
         body {
@@ -56,7 +60,7 @@
             font-family: 'Cinzel', serif;
         }
 
-        /* --- Loading Screen Styles --- */
+        /* --- Loading Screen --- */
         #loader-wrapper {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -66,59 +70,69 @@
             z-index: 9999;
             transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.8s;
         }
+        #loader-wrapper.loaded { opacity: 0; visibility: hidden; pointer-events: none; }
 
-        #loader-wrapper.loaded {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
+        .loader {
+            color: #fff;
+            font-family: Consolas, Menlo, Monaco, monospace;
+            font-weight: bold;
+            font-size: 78px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
         }
-
-        .loader-content {
-            position: relative;
-            display: flex; flex-direction: column;
-            align-items: center; gap: 2rem;
+        .loader:before {
+            content: "{";
+            display: inline-block;
+            animation: pulse-bracket 0.4s alternate infinite ease-in-out;
         }
-
-        .loader-logo-container {
-            position: relative;
-            width: 120px; height: 120px;
+        .loader:after {
+            content: "}";
+            display: inline-block;
+            animation: pulse-bracket 0.4s 0.3s alternate infinite ease-in-out;
         }
-
-        .loader-logo-img {
-            width: 100%; height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 0 15px var(--accent-glow));
-            animation: pulse-glow 2s ease-in-out infinite;
+        .loader-mid-logo {
+            height: 60px;
+            width: auto;
+            filter: drop-shadow(0 0 10px var(--accent-glow));
         }
-
-        .loader-circle {
-            position: absolute;
-            top: -10px; left: -10px; right: -10px; bottom: -10px;
-            border: 2px solid transparent;
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1.5s linear infinite;
+        @keyframes pulse-bracket {
+            to { transform: scale(0.85); opacity: 0.5; }
         }
 
         .loader-progress-text {
+            margin-top: 2rem;
             font-size: 10px;
-            letter-spacing: 0.5em;
+            letter-spacing: 0.6em;
             color: var(--accent);
             text-transform: uppercase;
             font-weight: bold;
+            font-family: 'Cinzel', serif;
         }
 
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 0.6; transform: scale(0.95); }
-            50% { opacity: 1; transform: scale(1); }
+        /* --- Skeleton Loading --- */
+        .skeleton {
+            position: relative;
+            overflow: hidden;
+            background-color: var(--glass) !important;
+            border-color: var(--glass-border) !important;
         }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .skeleton::after {
+            content: "";
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            animation: shimmer 1.5s infinite;
         }
+        @keyframes shimmer { 100% { transform: translateX(100%); } }
 
-        /* --- Scroll & UI Elements --- */
+        .content-hidden { opacity: 0; filter: blur(10px); transition: opacity 1s ease, filter 1s ease; }
+        .content-visible { opacity: 1; filter: blur(0); }
+
+        /* --- UI Elements --- */
         #scroll-progress {
             position: fixed;
             top: 0; left: 0; height: 3px;
@@ -186,65 +200,184 @@
             opacity: 0; visibility: hidden; transform: translateY(20px);
             transition: all 0.4s ease;
         }
-
         #back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
-
-        .scanline {
-            width: 100%; height: 100px; z-index: 10;
-            background: linear-gradient(0deg, transparent 0%, rgba(255,180,67,0.02) 50%, transparent 100%);
-            position: fixed; top: -100px; animation: scanline 8s linear infinite; pointer-events: none;
-        }
-
-        @keyframes scanline { 0% { top: -100px; } 100% { top: 100%; } }
 
         #mobile-menu {
             background: var(--overlay);
             transform: translateY(-100%);
-            transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
         }
         #mobile-menu.active { transform: translateY(0); }
 
         .social-link { transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; }
         .social-link:hover { transform: translateY(-3px); color: var(--accent); filter: drop-shadow(0 0 8px var(--accent-glow)); }
 
-        input, textarea {
-            background: rgba(255, 255, 255, 0.03) !important;
-            border: 1px solid var(--glass-border) !important;
-            color: var(--text-main) !important;
-            transition: all 0.3s ease !important;
-        }
-
-        .skill-tag {
-            background: rgba(255, 180, 67, 0.05); border: 1px solid rgba(255, 180, 67, 0.1);
-            padding: 4px 12px; border-radius: 6px; font-size: 10px;
-            text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;
-        }
-
-        .profile-image-container {
-            position: relative; border-radius: 1.5rem; overflow: hidden;
-            box-shadow: 0 0 20px var(--accent-glow); transition: all 0.5s ease;
-            background: var(--glass); border: 1px solid var(--glass-border);
-        }
-        .profile-image-container img { width: 100%; height: auto; display: block; object-fit: cover; }
-        .profile-image-container:hover { box-shadow: 0 0 40px var(--accent); transform: scale(1.02); }
-
         .logo-img { height: 42px; width: auto; filter: drop-shadow(0 0 5px var(--accent-glow)); transition: all 0.3s ease; }
         .group:hover .logo-img { transform: scale(1.1); filter: drop-shadow(0 0 10px var(--accent)); }
+
+        /* --- Enhanced Profile Photo Style --- */
+        .profile-image-container {
+            position: relative; 
+            border-radius: 2rem; 
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            background: var(--glass); 
+            border: 1px solid var(--glass-border);
+            aspect-ratio: 1 / 1.25;
+        }
+        .profile-image-container img { 
+            width: 100%; 
+            height: 100%; 
+            display: block; 
+            object-fit: cover;
+            filter: saturate(0.8) contrast(1.1);
+            transition: transform 0.8s ease, filter 0.8s ease;
+        }
+        .profile-image-container:hover { 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 30px var(--accent-glow); 
+            transform: translateY(-8px) scale(1.01); 
+            border-color: var(--accent);
+        }
+        .profile-image-container:hover img {
+            transform: scale(1.05);
+            filter: saturate(1.1) contrast(1.1);
+        }
+        .profile-image-container::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(5, 10, 15, 0.4) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        /* --- Skill Tag Styles --- */
+        .skill-tag {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: default;
+        }
+        .skill-tag::before {
+            content: "";
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+            transition: transform 0.3s ease;
+        }
+        .skill-tag:hover {
+            background: rgba(255, 180, 67, 0.08);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: translateY(-3px);
+            color: var(--accent);
+        }
+        .skill-tag:hover::before { transform: scale(1.5); }
+
+        /* --- Scrolling Logos --- */
+        .logo-scroller {
+            width: 100%;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 3rem 0;
+            position: relative;
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+        }
+        .logo-track {
+            display: flex;
+            width: max-content;
+            animation: scroll 40s linear infinite;
+            gap: 6rem;
+            align-items: center;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .scroller-logo {
+            height: 40px;
+            min-width: 40px;
+            opacity: 0.6;
+            transition: all 0.4s ease;
+            filter: grayscale(1);
+        }
+        .scroller-logo:hover {
+            opacity: 1;
+            filter: grayscale(0) drop-shadow(0 0 10px var(--accent-glow));
+            transform: scale(1.15);
+        }
+        .scroller-logo svg {
+            height: 100%;
+            width: auto;
+            fill: var(--accent);
+        }
+
+        /* --- Gallery & 3D Cards --- */
+        .gallery-container { perspective: 1200px; }
+        .gallery-item {
+            position: relative; overflow: hidden; border-radius: 0.75rem;
+            cursor: pointer; background: var(--glass); border: 1px solid var(--glass-border);
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s ease;
+            transform-style: preserve-3d;
+        }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-item:hover, .gallery-item:active {
+            transform: rotateY(12deg) rotateX(6deg) translateZ(40px);
+            box-shadow: -20px 20px 40px rgba(0,0,0,0.5), 0 0 25px var(--accent-glow);
+            border-color: var(--accent); z-index: 10;
+        }
+        .gallery-overlay {
+            position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+            opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: flex-end; padding: 0.75rem;
+            transform: translateZ(25px);
+        }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+        #lightbox {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(12px);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+            padding: 1.5rem; cursor: zoom-out;
+        }
+        #lightbox img { max-width: 95%; max-height: 85vh; border-radius: 0.5rem; }
+
+        .scanline {
+            width: 100%; height: 100px; z-index: 10;
+            background: linear-gradient(0deg, transparent 0%, rgba(255,180,67,0.02) 50%, transparent 100%);
+            position: fixed; top: -100px; animation: scanline 8s linear infinite; pointer-events: none;
+        }
+        @keyframes scanline { 0% { top: -100px; } 100% { top: 100%; } }
     </style>
 </head>
 <body class="antialiased">
 
     <!-- Loading Screen -->
     <div id="loader-wrapper">
-        <div class="loader-content">
-            <div class="loader-logo-container">
-                <div class="loader-circle"></div>
-                <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="SJM" class="loader-logo-img">
+        <div class="loader-content flex flex-col items-center">
+            <div class="loader">
+                <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="SJM" class="loader-mid-logo">
             </div>
             <div class="loader-progress-text">
-                <span id="loader-percent">0</span>% Initializing
+                <span id="loader-percent">0</span>% INITIALIZING
             </div>
         </div>
+    </div>
+
+    <!-- Lightbox Overlay -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" src="" alt="Enlarged Artwork">
     </div>
 
     <div id="scroll-progress"></div>
@@ -259,22 +392,23 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
     </button>
 
+    <!-- Navigation Bar -->
     <nav class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-6xl px-6">
         <div class="glass-panel rounded-full px-6 md:px-10 py-2.5 md:py-3.5 flex items-center justify-between">
             <div class="flex items-center">
                 <a href="#origins" class="outline-none group flex items-center gap-3">
                     <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="logo-img">
-                    <div class="hidden sm:block text-xl font-bold tracking-[0.2em] accent-glow">sjm.dev</div>
+                    <div class="hidden sm:block md:hidden text-xl font-bold tracking-[0.2em] accent-glow">sjm.dev</div>
                 </a>
             </div>
 
-            <div class="hidden md:flex gap-8 items-center">
+            <div class="hidden md:flex gap-6 lg:gap-8 items-center">
                 <a href="#origins" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-origins">Origins</a>
                 <a href="#about" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-about">About</a>
                 <a href="#cv" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-cv">Chronicle</a>
                 <a href="#academy" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-academy">Academy</a>
                 <a href="#arsenal" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-arsenal">Arsenal</a>
-                <a href="#projects" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-works">Works</a>
+                <a href="#gallery" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-gallery">Gallery</a>
                 <a href="#contact" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-contact">Contact</a>
                 <div class="h-5 w-[1px] bg-white/10 mx-1"></div>
                 <div class="flex items-center gap-1.5">
@@ -293,6 +427,7 @@
         </div>
     </nav>
 
+    <!-- Mobile Menu Overlay -->
     <div id="mobile-menu" class="fixed inset-0 z-[90] flex flex-col items-center justify-center gap-8 md:hidden text-center px-4">
         <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="w-24 h-auto mb-8 accent-glow">
         <a href="#origins" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-origins">Origins</a>
@@ -300,248 +435,298 @@
         <a href="#cv" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-cv">Chronicle</a>
         <a href="#academy" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-academy">Academy</a>
         <a href="#arsenal" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-arsenal">Arsenal</a>
-        <a href="#projects" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-works">Works</a>
+        <a href="#gallery" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-gallery">Gallery</a>
         <a href="#contact" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-contact">Contact</a>
     </div>
 
-    <!-- Hero Section -->
-    <header id="origins" class="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20">
-        <div class="mb-6 opacity-60 tracking-[0.5em] text-[10px] md:text-[11px] uppercase font-bold text-[var(--accent)]" data-i18n="hero-tag">IT Operations • Project Management • Creative Technologist</div>
-        <h1 class="text-4xl md:text-8xl font-bold mb-8 tracking-tighter leading-none">
-            STEPHEN JAMES<br>
-            <span class="accent-glow">MORRIS</span>
-        </h1>
-        <div class="max-w-xl text-sm md:text-base text-[var(--text-muted)] mb-12 leading-relaxed font-semibold" data-i18n="hero-desc">
-            Bridging the gap between corporate architecture and immersive digital art. Specialized in managing high-performance digital projects and crafting creative user interfaces.
-        </div>
-    </header>
-
-    <!-- About Me (The Essence) -->
-    <section id="about" class="py-32 px-4 max-w-5xl mx-auto relative">
-        <div class="flex items-center gap-4 mb-20 justify-center text-center">
-            <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
-            <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="about-title">The Essence</h2>
-            <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-            <div class="glass-card p-8 rounded-3xl border-l-4 border-l-[var(--accent)] h-full">
-                <h3 class="text-xl font-bold accent-glow mb-6 uppercase tracking-widest" data-i18n="about-job-title">Web Business Manager</h3>
-                <div class="space-y-4 text-sm md:text-base">
-                    <div class="flex border-b border-[var(--glass-border)] pb-2">
-                        <span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-name">Name</span>
-                        <span class="w-2/3 font-bold">Stephen James Morris</span>
-                    </div>
-                    <div class="flex border-b border-[var(--glass-border)] pb-2">
-                        <span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-dob">Birth</span>
-                        <span>25. February 1984</span>
-                    </div>
-                    <div class="flex border-b border-[var(--glass-border)] pb-2">
-                        <span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-address">Address</span>
-                        <span>Mahlerstraße 7a, 30989 Gehrden</span>
-                    </div>
-                    <div class="flex border-b border-[var(--glass-border)] pb-2">
-                        <span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-nat">Nationality</span>
-                        <span data-i18n="about-val-nat">German</span>
-                    </div>
-                    <div class="flex border-b border-[var(--glass-border)] pb-2">
-                        <span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-mobile">Mobile</span>
-                        <a href="tel:+4915236262894" class="font-bold">+49 (0)1523 6262894</a>
-                    </div>
-                    <div class="flex">
-                        <span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-email">Email</span>
-                        <a href="mailto:sjmorris@duck.com" class="font-bold italic">sjmorris@duck.com</a>
-                    </div>
-                </div>
+    <div id="main-content" class="content-hidden">
+        <header id="origins" class="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20">
+            <div class="mb-6 opacity-60 tracking-[0.5em] text-[10px] md:text-[11px] uppercase font-bold text-[var(--accent)]" data-i18n="hero-tag">IT Operations • Project Management • Creative Technologist</div>
+            <h1 class="text-4xl md:text-8xl font-bold mb-8 tracking-tighter leading-none">
+                STEPHEN JAMES<br>
+                <span class="accent-glow">MORRIS</span>
+            </h1>
+            <div class="max-w-xl text-sm md:text-base text-[var(--text-muted)] mb-12 leading-relaxed font-semibold" data-i18n="hero-desc">
+                Bridging the gap between corporate architecture and immersive digital art. Specialized in managing high-performance digital projects and crafting creative user interfaces.
             </div>
-            
-            <div class="space-y-6">
-                <div class="profile-image-container">
-                    <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/IMG_20260125_212028.png" alt="Stephen James Morris Profile" loading="eager">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity flex items-end p-6">
-                        <div class="text-xs uppercase tracking-widest font-bold text-white">Digital Strategist & Architect</div>
+        </header>
+
+        <!-- The Essence -->
+        <section id="about" class="py-32 px-4 max-w-5xl mx-auto relative text-left">
+            <div class="flex items-center gap-4 mb-20 justify-center text-center">
+                <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+                <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="about-title">The Essence</h2>
+                <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+                <div class="glass-card p-8 rounded-3xl border-l-4 border-l-[var(--accent)] h-full">
+                    <h3 class="text-xl font-bold accent-glow mb-6 uppercase tracking-widest" data-i18n="about-job-title">Web Business Manager</h3>
+                    <div class="space-y-4 text-sm md:text-base mb-8">
+                        <div class="flex border-b border-[var(--glass-border)] pb-2"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-name">Name</span><span class="w-2/3 font-bold">Stephen James Morris</span></div>
+                        <div class="flex border-b border-[var(--glass-border)] pb-2"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-dob">Birth</span><span>25. February 1984</span></div>
+                        <div class="flex border-b border-[var(--glass-border)] pb-2"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-address">Address</span><span>Mahlerstraße 7a, 30989 Gehrden</span></div>
+                        <div class="flex border-b border-[var(--glass-border)] pb-2"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-nat">Nationality</span><span data-i18n="about-val-nat">German</span></div>
+                        <div class="flex border-b border-[var(--glass-border)] pb-2"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-mobile">Mobile</span><a href="tel:+4915236262894" class="font-bold">+49 (0)1523 6262894</a></div>
+                        <div class="flex"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-email">Email</span><a href="mailto:sjmorris@duck.com" class="font-bold italic">sjmorris@duck.com</a></div>
+                    </div>
+                    <div class="pt-6 border-t border-[var(--glass-border)] flex gap-6">
+                        <a href="https://stephenjamesmorris.github.io" target="_blank" class="social-link opacity-60 hover:opacity-100 transition-opacity">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        </a>
+                        <a href="https://linkedin.com/in/stephen-james-morris" target="_blank" class="social-link opacity-60 hover:opacity-100 transition-opacity">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                        </a>
+                        <a href="mailto:sjmorris@duck.com" class="social-link opacity-60 hover:opacity-100 transition-opacity">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </a>
                     </div>
                 </div>
-                <div class="glass-card p-6 rounded-2xl">
-                    <p class="text-base leading-relaxed text-[var(--text-main)] font-medium mb-4" data-i18n="about-text-p1">
-                        With over a decade of experience in IT operations and project management, I’ve navigated corporate environments while maintaining a deep passion for digital art.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Chronicle -->
-    <section id="cv" class="py-24 px-4 max-w-5xl mx-auto relative">
-        <div class="flex items-center gap-4 mb-20 justify-center text-center">
-            <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
-            <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="cv-title">The Chronicle</h2>
-            <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
-        </div>
-
-        <div class="relative">
-            <div class="timeline-line"></div>
-            <div class="mb-16 flex flex-col md:flex-row items-center w-full">
-                <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2018 — 2026</span></div>
-                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] shadow-[0_0_15px_var(--accent)] border-4 border-[var(--bg-deep)]"></div>
-                <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0">
+                <div class="space-y-6">
+                    <div class="profile-image-container skeleton">
+                        <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/IMG_20260125_212028.png" alt="Profile" onload="this.parentElement.classList.remove('skeleton')">
+                    </div>
                     <div class="glass-card p-6 rounded-2xl text-left">
-                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job1-title">Founder & Lead Developer</h3>
-                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">Morris Digital</div>
-                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job1-desc">Establishing a creative digital agency specialized in design and software implementations for SMEs.</p>
+                        <p class="text-base leading-relaxed text-[var(--text-main)] font-medium mb-4" data-i18n="about-text-p1">With over a decade of experience in IT operations and project management, I’ve navigated corporate environments while maintaining a deep passion for digital art.</p>
                     </div>
                 </div>
             </div>
-            <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full">
-                <div class="hidden md:block w-1/2 pl-12 text-left"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2016 — 2017</span></div>
-                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-60 border-4 border-[var(--bg-deep)]"></div>
-                <div class="w-full md:w-1/2 md:pr-12 mt-4 md:mt-0">
-                    <div class="glass-card p-6 rounded-2xl text-left md:text-right">
-                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job2-title">Web Projekt Manager</h3>
-                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">Shisha Bong Club, Hannover</div>
-                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job2-desc">Creating and executing e-commerce online strategies.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-16 flex flex-col md:flex-row items-center w-full">
-                <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2015 — 2017</span></div>
-                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-50 border-4 border-[var(--bg-deep)]"></div>
-                <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0">
-                    <div class="glass-card p-6 rounded-2xl text-left">
-                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job3-title">Web Business Manager</h3>
-                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">eSmoker Warehouse, Hannover</div>
-                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job3-desc">IT infrastructure and international customer correspondence.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full">
-                <div class="hidden md:block w-1/2 pl-12 text-left"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2013 — 2014</span></div>
-                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-40 border-4 border-[var(--bg-deep)]"></div>
-                <div class="w-full md:w-1/2 md:pr-12 mt-4 md:mt-0">
-                    <div class="glass-card p-6 rounded-2xl text-left md:text-right">
-                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job4-title">IT Support Manager</h3>
-                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">silbersaiten - Bangiev & Bangiev GbR</div>
-                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job4-desc">Coordinating development teams and quality checks.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-16 flex flex-col md:flex-row items-center w-full">
-                <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2012 — 2013</span></div>
-                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-30 border-4 border-[var(--bg-deep)]"></div>
-                <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0">
-                    <div class="glass-card p-6 rounded-2xl text-left">
-                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job5-title">Operations System Coordinator</h3>
-                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">syncreon Deutschland GmbH</div>
-                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job5-desc">IT support coordination for VW & Audi.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Academy -->
-    <section id="academy" class="py-24 px-4 max-w-6xl mx-auto relative">
-        <div class="flex items-center gap-4 mb-20 justify-center text-center">
-            <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
-            <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="nav-academy">The Academy</h2>
-            <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div class="glass-card p-8 rounded-3xl h-full border-t-2 border-t-[var(--accent)]/30">
-                <h3 class="text-lg font-bold uppercase mb-2 tracking-wider" data-i18n="edu1-title">Web Business Management</h3>
-                <p class="text-sm opacity-70 mb-4">Diploma, Webmasters Europe e.V.</p>
+        <!-- The Chronicle -->
+        <section id="cv" class="py-24 px-4 max-w-5xl mx-auto relative text-left">
+            <div class="flex items-center gap-4 mb-20 justify-center text-center">
+                <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+                <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="cv-title">The Chronicle</h2>
+                <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
             </div>
-            <div class="glass-card p-8 rounded-3xl h-full">
-                <h3 class="text-lg font-bold uppercase mb-2 tracking-wider" data-i18n="edu2-title">Online Marketing Manager</h3>
-                <p class="text-sm opacity-70 mb-4">Certificate, Webmasters Europe e.V.</p>
+            <div class="relative">
+                <div class="timeline-line"></div>
+                <div class="mb-16 flex flex-col md:flex-row items-center w-full">
+                    <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2018 — 2026</span></div>
+                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] shadow-[0_0_15px_var(--accent)] border-4 border-[var(--bg-deep)]"></div>
+                    <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job1-title">Founder & Lead Developer</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">Morris Digital</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job1-desc">Establishing a creative digital agency specialized in design and software implementations.</p></div></div>
+                </div>
+                <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full">
+                    <div class="hidden md:block w-1/2 pl-12 text-left"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2016 — 2017</span></div>
+                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-60 border-4 border-[var(--bg-deep)]"></div>
+                    <div class="w-full md:w-1/2 md:pr-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl text-left md:text-right"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job2-title">Web Projekt Manager</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">Shisha Bong Club, Hannover</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job2-desc">Creating and executing e-commerce online strategies.</p></div></div>
+                </div>
+                <div class="mb-16 flex flex-col md:flex-row items-center w-full text-left">
+                    <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2015 — 2017</span></div>
+                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-50 border-4 border-[var(--bg-deep)]"></div>
+                    <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job3-title">Web Business Manager</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">eSmoker Warehouse, Hannover</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job3-desc">IT infrastructure and international customer correspondence.</p></div></div>
+                </div>
+                <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full text-left">
+                    <div class="hidden md:block w-1/2 pl-12 text-left"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2013 — 2014</span></div>
+                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-40 border-4 border-[var(--bg-deep)]"></div>
+                    <div class="w-full md:w-1/2 md:pr-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl text-left md:text-right"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job4-title">IT Support Manager</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">silbersaiten GbR</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job4-desc">Coordinating development teams and quality checks.</p></div></div>
+                </div>
+                <div class="mb-16 flex flex-col md:flex-row items-center w-full text-left">
+                    <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2012 — 2013</span></div>
+                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-30 border-4 border-[var(--bg-deep)]"></div>
+                    <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job5-title">Operations System Coordinator</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">syncreon Deutschland GmbH</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job5-desc">IT support coordination for VW & Audi.</p></div></div>
+                </div>
+                <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full text-left">
+                    <div class="hidden md:block w-1/2 pl-12 text-left"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2006 — 2011</span></div>
+                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-20 border-4 border-[var(--bg-deep)]"></div>
+                    <div class="w-full md:w-1/2 md:pr-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl text-left md:text-right"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job6-title">Owner / Publisher</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">The Opinion News, SA</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job6-desc">Lifestyle and nature conservation magazine in South Africa.</p></div></div>
+                </div>
+                <div class="mb-16 flex flex-col md:flex-row items-center w-full text-left">
+                    <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2001 — 2004</span></div>
+                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-10 border-4 border-[var(--bg-deep)]"></div>
+                    <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl text-left"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job7-title">Regular Soldier</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold">TrspHubschrRgt 10, Faßberg</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job7-desc">Staff service in Human Resources.</p></div></div>
+                </div>
             </div>
-            <div class="glass-card p-8 rounded-3xl h-full">
-                <h3 class="text-lg font-bold uppercase mb-2 tracking-wider" data-i18n="edu3-title">Web Interface Designer</h3>
-                <p class="text-sm opacity-70 mb-4">Certificate, Webmasters Europe e.V.</p>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Arsenal -->
-    <section id="arsenal" class="py-24 px-4 max-w-6xl mx-auto relative">
-        <div class="flex items-center gap-4 mb-20 justify-center text-center">
-            <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
-            <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="nav-arsenal">The Arsenal</h2>
-            <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="glass-card p-8 rounded-3xl">
-                <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat1">Creative Technologist</h3>
-                <div class="flex flex-wrap gap-3">
-                    <span class="skill-tag">Three.js</span><span class="skill-tag">React Fiber</span><span class="skill-tag">WebGL</span><span class="skill-tag">GLSL Shaders</span><span class="skill-tag">TypeScript</span><span class="skill-tag">JavaScript ES6+</span><span class="skill-tag">Tailwind CSS</span><span class="skill-tag">HTML5 / CSS3</span><span class="skill-tag">Node.js</span>
+        <!-- Academy -->
+        <section id="academy" class="py-24 px-4 max-w-6xl mx-auto relative">
+            <div class="flex items-center gap-4 mb-20 justify-center text-center">
+                <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+                <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="nav-academy">The Academy</h2>
+                <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-center">
+                <!-- 2016-2017: Web Business Management -->
+                <div class="glass-card p-8 rounded-3xl h-full border-t-2 border-t-[var(--accent)]/30">
+                    <div class="text-[var(--accent)] text-[10px] font-bold mb-2">2016 — 2017</div>
+                    <h3 class="text-sm font-bold uppercase mb-2 tracking-wider" data-i18n="edu1-title">Web Business Management</h3>
+                    <p class="text-[10px] opacity-70 italic mb-4" data-i18n="edu1-sub">Diploma & Thesis, Webmasters Europe e.V.</p>
+                    <p class="text-[11px] leading-relaxed opacity-80" data-i18n="edu1-desc">Completed under the supervision of GFN AG.</p>
+                </div>
+                <!-- 2016: Online Marketing Manager -->
+                <div class="glass-card p-8 rounded-3xl h-full">
+                    <div class="text-[var(--accent)] text-[10px] font-bold mb-2">2016</div>
+                    <h3 class="text-sm font-bold uppercase mb-2 tracking-wider" data-i18n="edu2-title">Online Marketing Manager</h3>
+                    <p class="text-[10px] opacity-70 italic mb-4" data-i18n="edu2-sub">Webmasters Europe e.V.</p>
+                    <p class="text-[11px] leading-relaxed opacity-80" data-i18n="edu2-desc">Certification in Online Marketing & Web Analytics.</p>
+                </div>
+                <!-- 2016: Web Interface Designer -->
+                <div class="glass-card p-8 rounded-3xl h-full">
+                    <div class="text-[var(--accent)] text-[10px] font-bold mb-2">2016</div>
+                    <h3 class="text-sm font-bold uppercase mb-2 tracking-wider" data-i18n="edu3-title">Web Interface Designer</h3>
+                    <p class="text-[10px] opacity-70 italic mb-4" data-i18n="edu3-sub">Webmasters Europe e.V.</p>
+                    <p class="text-[11px] leading-relaxed opacity-80" data-i18n="edu3-desc">Certification in UI Design & Usability.</p>
+                </div>
+                <!-- 2016: Web Architect -->
+                <div class="glass-card p-8 rounded-3xl h-full">
+                    <div class="text-[var(--accent)] text-[10px] font-bold mb-2">2016</div>
+                    <h3 class="text-sm font-bold uppercase mb-2 tracking-wider" data-i18n="edu4-title">Web Architect</h3>
+                    <p class="text-[10px] opacity-70 italic mb-4" data-i18n="edu4-sub">Webmasters Europe e.V.</p>
+                    <p class="text-[11px] leading-relaxed opacity-80" data-i18n="edu4-desc">Certification in Website Conception & Project Management.</p>
+                </div>
+                <!-- 2013: PrestaShop -->
+                <div class="glass-card p-8 rounded-3xl h-full">
+                    <div class="text-[var(--accent)] text-[10px] font-bold mb-2">2013</div>
+                    <h3 class="text-sm font-bold uppercase mb-2 tracking-wider" data-i18n="edu5-title">PrestaShop Developer</h3>
+                    <p class="text-[10px] opacity-70 italic mb-4" data-i18n="edu5-sub">PrestaShop S.A.</p>
+                    <p class="text-[11px] leading-relaxed opacity-80" data-i18n="edu5-desc">Certified Developer & Integrator Level 1.</p>
+                </div>
+                <!-- 2013: Verizon -->
+                <div class="glass-card p-8 rounded-3xl h-full">
+                    <div class="text-[var(--accent)] text-[10px] font-bold mb-2">2013</div>
+                    <h3 class="text-sm font-bold uppercase mb-2 tracking-wider" data-i18n="edu6-title">Verizon Enterprise Center</h3>
+                    <p class="text-[10px] opacity-70 italic mb-4" data-i18n="edu6-sub">Verizon Certification</p>
+                    <p class="text-[11px] leading-relaxed opacity-80" data-i18n="edu6-desc">Certification in Verizon Enterprise Center Management.</p>
                 </div>
             </div>
-            <div class="glass-card p-8 rounded-3xl">
-                <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat2">Management & Ops</h3>
-                <div class="flex flex-wrap gap-3">
-                    <span class="skill-tag">Product Ownership</span><span class="skill-tag">Project Lead</span><span class="skill-tag">Agile Methodologies</span><span class="skill-tag">Scrum / Kanban</span><span class="skill-tag">e-Commerce Strategy</span><span class="skill-tag">IT Operations</span><span class="skill-tag">Business Process</span><span class="skill-tag">SME Consulting</span>
-                </div>
-            </div>
-            <div class="glass-card p-8 rounded-3xl">
-                <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat3">Design & Commerce</h3>
-                <div class="flex flex-wrap gap-3">
-                    <span class="skill-tag">UI/UX Design</span><span class="skill-tag">Web Architecture</span><span class="skill-tag">PrestaShop</span><span class="skill-tag">Online Marketing</span><span class="skill-tag">Branding</span><span class="skill-tag">Responsive Design</span>
-                </div>
-            </div>
-            <div class="glass-card p-8 rounded-3xl">
-                <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat4">Legacy & Artifacts</h3>
-                <div class="flex flex-wrap gap-3">
-                    <span class="skill-tag">C++</span><span class="skill-tag">Server Admin</span><span class="skill-tag">Hardware Mgmt</span><span class="skill-tag">Helpdesk Ops</span><span class="skill-tag">Print Media</span><span class="skill-tag">Quality Control</span>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Footer -->
-    <footer id="contact" class="py-32 px-4 text-center border-t border-[var(--glass-border)] bg-black/5">
-        <a href="#origins" class="inline-block group mb-8">
-            <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="h-24 md:h-32 w-auto mx-auto drop-shadow-2xl transition-all duration-500 group-hover:scale-110">
-        </a>
-        <div class="footer-brand text-3xl md:text-5xl font-bold tracking-[0.6em] text-[var(--accent)] mb-12 uppercase italic transform -translate-y-2">SJM.DEV</div>
-        <div class="flex flex-wrap justify-center gap-6 md:gap-10 mb-12">
-            <a href="https://stephenjamesmorris.github.io" target="_blank" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                <span>GitHub</span>
-            </a>
-            <a href="https://linkedin.com/in/stephen-james-morris" target="_blank" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                <span>LinkedIn</span>
-            </a>
-            <a href="mailto:sjmorris@duck.com" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2 italic">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                <span>Email</span>
-            </a>
+        <!-- The Arsenal -->
+        <section id="arsenal" class="py-24 px-4 max-w-6xl mx-auto relative">
+            <div class="flex items-center gap-4 mb-20 justify-center text-center">
+                <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+                <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="nav-arsenal">The Arsenal</h2>
+                <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="glass-card p-8 rounded-3xl text-left">
+                    <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat1">Creative Technologist</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="skill-tag">Three.js</span><span class="skill-tag">React Fiber</span><span class="skill-tag">WebGL</span><span class="skill-tag">GLSL Shaders</span><span class="skill-tag">TypeScript</span><span class="skill-tag">JavaScript ES6+</span><span class="skill-tag">Tailwind CSS</span><span class="skill-tag">HTML5 / CSS3</span><span class="skill-tag">Node.js</span>
+                    </div>
+                </div>
+                <div class="glass-card p-8 rounded-3xl text-left">
+                    <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat2">Management & Ops</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="skill-tag">Product Ownership</span><span class="skill-tag">Project Lead</span><span class="skill-tag">Agile Methodologies</span><span class="skill-tag">Scrum / Kanban</span><span class="skill-tag">e-Commerce Strategy</span><span class="skill-tag">IT Operations</span><span class="skill-tag">Business Process</span><span class="skill-tag">SME Consulting</span>
+                    </div>
+                </div>
+                <div class="glass-card p-8 rounded-3xl text-left">
+                    <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat3">Design & Commerce</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="skill-tag">UI/UX Design</span><span class="skill-tag">Web Architecture</span><span class="skill-tag">PrestaShop</span><span class="skill-tag">Online Marketing</span><span class="skill-tag">Branding</span><span class="skill-tag">Responsive Design</span>
+                    </div>
+                </div>
+                <div class="glass-card p-8 rounded-3xl text-left">
+                    <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat4">Legacy & Artifacts</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="skill-tag">C++</span><span class="skill-tag">Server Admin</span><span class="skill-tag">Hardware Mgmt</span><span class="skill-tag">Helpdesk Ops</span><span class="skill-tag">Print Media</span><span class="skill-tag">Quality Control</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scrolling Logos -->
+        <div class="logo-scroller">
+            <div class="logo-track">
+                <!-- Tech Icons: Node.js, html, css, Javascript, next.js, github, React, php -->
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M11.996,22.25L3.332,17.262V7.288L11.996,2.3L20.66,7.288v9.974L11.996,22.25z M4.53,16.568l7.466,4.298l7.466-4.298 V7.982l-7.466-4.298l-7.466,4.298V16.568z"/></svg></div> <!-- Node -->
+                <div class="scroller-logo"><svg viewBox="0 0 128 128"><path d="M12.7 1.4h102.6L106 103.3l-42 11.6l-42-11.6L12.7 1.4zM93.3 35.6H34.7l1.7 18.9h55.2l-1.7 18.9H55.4l.6 6.3l8 2.2l8-2.2l.5-5.6h18.9l-1 11.4l-16.4 4.5l-16.4-4.5l-1.1-12.7l-1-11.4H35l-1-11.4l-1-11.4l-1-11.4H95l-1.7 18.9z"/></svg></div> <!-- HTML5 -->
+                <div class="scroller-logo"><svg viewBox="0 0 128 128"><path d="M12.7 1.4h102.6L106 103.3l-42 11.6l-42-11.6L12.7 1.4zM94.4 19.3l-1.7 18.9H47.4l1.7 18.9h43.6l-1.7 18.9H49.1l.6 6.3l8 2.2l8-2.2l.5-5.6H85l-1 11.4l-16.4 4.5l-16.4-4.5l-1.1-12.7l-1-11.4h-18.9l1 11.4l1.7 18.9l1.7 18.9h73.3l1.7-18.9l1.7-18.9l1.7-18.9l.7-7.6l1-11.3H94.4z"/></svg></div> <!-- CSS3 -->
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm11.725 13.582c-.131-.482-.313-.946-.548-1.385l-.105-.192c-.197-.361-.417-.706-.662-1.031l-.225-.298c-.287-.384-.607-.738-.952-1.066l-.326-.309c-.381-.362-.8-.686-1.246-.968l-.348-.22c-.443-.281-.926-.511-1.424-.691l-.396-.143c-.456-.165-.935-.248-1.421-.248h-.062c-.443 0-.877.069-1.288.204l-.261.086c-.368.121-.715.285-1.036.488l-.206.13c-.305.192-.58.416-.819.667l-.146.153c-.223.234-.415.489-.575.76l-.089.151c-.138.234-.249.48-.328.736l-.04.129c-.062.203-.105.413-.129.627v.03c-.015.132-.021.266-.021.399c0 .402.062.8.181 1.173l.034.107c.101.319.239.624.411.91l.07.117c.175.291.382.565.617.816l.115.123c.228.243.483.456.757.636l.159.105c.294.193.61.348.941.464l.135.047c.376.131.77.197 1.168.197h.04c.484 0 .963-.083 1.416-.248l.396-.143c.498-.18 1.011-.429 1.488-.737l.348-.22c.446-.282.865-.606,1.246-.968l.326-.309c.345-.328.665-.682.952-1.066l.225-.298c.245-.325.465-.67.662-1.031l.105-.192c.235-.439.417-.903.548-1.385l.034-.125c.101-.371.152-.754.152-1.139c0-.422-.062-.838-.182-1.238l-.004-.012zm-12.065.733v-.004c0-.21.035-.417.103-.615l.03-.086c.081-.234.2-.455.35-.658l.092-.123c.159-.214.349-.408.567-.577l.152-.117c.152-.117.319-.217.498-.3l.093-.043c.2-.092.411-.161.628-.206l.088-.018c.218-.044.443-.066.67-.066h.052c.42 0 .83.076 1.216.224l.099.038c.218.083.428.188.625.314l.093.06c.21.134.407.284.588.45l.132.12c.168.153.322.319.46.494l.099.125c.138.175.26.363.364.561l.067.127c.105.198.192.406.26.621l.023.073c.068.21.103.427.103.649s-.035.439-.103.649l-.023.073c-.068.215-.155.423-.26.621l-.067.127c-.104.198-.226.386-.364.561l-.099.125c-.138.175-.292.341-.46.494l-.132.12c-.181.166-.378.316-.588.45l-.093.06c-.197.126-.407.231-.625.314l-.099.038c-.386.148-.796.224-1.216.224h-.052c-.227 0-.452-.022-.67-.066l-.088-.018c-.217-.045-.428-.114-.628-.206l-.093-.043c-.179-.083-.346-.183-.498-.3l-.152-.117c-.218-.169-.408-.363-.567-.577l-.092-.123c-.15-.203-.269-.424-.35-.658l-.03-.086a2.03 2.03 0 0 1-.103-.615z"/></svg></div> <!-- JS -->
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M13 12L21.5 22L20.5 22L13 13.2V22H12V2H13V12ZM13 2L4 12.5V2H3V22H4V13.8L12.5 2H13Z"/></svg></div> <!-- Next.js -->
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></div> <!-- GitHub -->
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M12 18.2c-3.4 0-6.2-2.8-6.2-6.2S8.6 5.8 12 5.8s6.2 2.8 6.2 6.2-2.8 6.2-6.2 6.2zm0-10.9c-2.6 0-4.7 2.1-4.7 4.7s2.1 4.7 4.7 4.7 4.7-2.1 4.7-4.7-2.1-4.7-4.7-4.7z"/><path d="M23.3 10.1l-1.3-.7c-.8-.4-1.7-.8-2.6-1.1l-.1-.1c-.9-.3-1.8-.6-2.8-.8l-1.2-.2c-.3 0-.5-.2-.5-.5s.2-.5.5-.5l1.2.2c1 .2 2 .5 3 .8l.1.1c.9.3 1.8.7 2.6 1.1l1.3.7c.3.2.4.5.2.8-.1.2-.4.3-.6.3l-.2-.1zM.7 13.9l1.3.7c.8.4 1.7.8 2.6 1.1l.1.1c.9.3 1.8.6 2.8.8l1.2.2c.3 0 .5.2.5.5s-.2.5-.5.5l-1.2-.2c-1-.2-2-.5-3-.8l-.1-.1c-.9-.3-1.8-.7-2.6-1.1l-1.3-.7c-.3-.2-.4-.5-.2-.8.1-.2.4-.3.6-.3l.2.1z"/><path d="M15.4 19.3l-.7-1.3c-.4-.8-.8-1.7-1.1-2.6l-.1-.1c-.3-.9-.6-1.8-.8-2.8l-.2-1.2c0-.3-.2-.5-.5-.5s-.5.2-.5.5l.2 1.2c.2 1 .5 2 .8 3l.1.1c.3.9.7 1.8 1.1 2.6l.7 1.3c.2.3.5.4.8.2.2-.1.3-.4.3-.6l-.1-.2zM8.6 4.7l.7 1.3c.4.8.8 1.7 1.1 2.6l.1.1c.3.9.6 1.8.8 2.8l.2 1.2c0 .3.2.5.5.5s.5-.2.5-.5l-.2-1.2c-.2-1-.5-2-.8-3l-.1-.1c-.3-.9-.7-1.8-1.1-2.6l-.7-1.3c-.2-.3-.5-.4-.8-.2-.2.1-.3.4-.3.6l.1.2z"/></svg></div> <!-- React -->
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M12.001 2c-3.14 0-5.783 2.152-6.526 5.068a.5.5 0 0 0 .12.483l3.633 4.316a.5.5 0 0 0 .762.003L13.78 7.375c.088-.102.215-.161.35-.162l3.418-.03a.5.5 0 0 0 .44-.738C17.062 4.14 14.734 2 12.001 2zM3 12c0 4.418 4.03 8 9 8s9-3.582 9-8c0-1.428-.415-2.766-1.137-3.905a.5.5 0 0 0-.825-.018L14.76 13.91a.5.5 0 0 1-.76.002l-1.92-2.228a.5.5 0 0 0-.756.001L9.12 14.156a.5.5 0 0 1-.772-.016L4.03 8.358a.5.5 0 0 0-.84.053C3.064 9.516 3 10.732 3 12z"/></svg></div> <!-- PHP -->
+                
+                <!-- Set 2 (for loop) -->
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M11.996,22.25L3.332,17.262V7.288L11.996,2.3L20.66,7.288v9.974L11.996,22.25z M4.53,16.568l7.466,4.298l7.466-4.298 V7.982l-7.466-4.298l-7.466,4.298V16.568z"/></svg></div>
+                <div class="scroller-logo"><svg viewBox="0 0 128 128"><path d="M12.7 1.4h102.6L106 103.3l-42 11.6l-42-11.6L12.7 1.4zM93.3 35.6H34.7l1.7 18.9h55.2l-1.7 18.9H55.4l.6 6.3l8 2.2l8-2.2l.5-5.6h18.9l-1 11.4l-16.4 4.5l-16.4-4.5l-1.1-12.7l-1-11.4H35l-1-11.4l-1-11.4l-1-11.4H95l-1.7 18.9z"/></svg></div>
+                <div class="scroller-logo"><svg viewBox="0 0 128 128"><path d="M12.7 1.4h102.6L106 103.3l-42 11.6l-42-11.6L12.7 1.4zM94.4 19.3l-1.7 18.9H47.4l1.7 18.9h43.6l-1.7 18.9H49.1l.6 6.3l8 2.2l8-2.2l.5-5.6H85l-1 11.4l-16.4 4.5l-16.4-4.5l-1.1-12.7l-1-11.4h-18.9l1 11.4l1.7 18.9l1.7 18.9h73.3l1.7-18.9l1.7-18.9l1.7-18.9l.7-7.6l1-11.3H94.4z"/></svg></div>
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3V3zm11.725 13.582c-.131-.482-.313-.946-.548-1.385l-.105-.192c-.197-.361-.417-.706-.662-1.031l-.225-.298c-.287-.384-.607-.738-.952-1.066l-.326-.309c-.381-.362-.8-.686-1.246-.968l-.348-.22c-.443-.281-.926-.511-1.424-.691l-.396-.143c-.456-.165-.935-.248-1.421-.248h-.062c-.443 0-.877.069-1.288.204l-.261.086c-.368.121-.715.285-1.036.488l-.206.13c-.305.192-.58.416-.819.667l-.146.153c-.223.234-.415.489-.575.76l-.089.151c-.138.234-.249.48-.328.736l-.04.129c-.062.203-.105.413-.129.627v.03c-.015.132-.021.266-.021.399c0 .402.062.8.181 1.173l.034.107c.101.319.239.624.411.91l.07.117c.175.291.382.565.617.816l.115.123c.228.243.483.456.757.636l.159.105c.294.193.61.348.941.464l.135.047c.376.131.77.197 1.168.197h.04c.484 0 .963-.083 1.416-.248l.396-.143c.498-.18 1.011-.429 1.488-.737l.348-.22c.446-.282.865-.606,1.246-.968l.326-.309c.345-.328.665-.682.952-1.066l.225-.298c.245-.325.465-.67.662-1.031l.105-.192c.235-.439.417-.903.548-1.385l.034-.125c.101-.371.152-.754.152-1.139c0-.422-.062-.838-.182-1.238l-.004-.012zm-12.065.733v-.004c0-.21.035-.417.103-.615l.03-.086c.081-.234.2-.455.35-.658l.092-.123c.159-.214.349-.408.567-.577l.152-.117c.152-.117.319-.217.498-.3l.093-.043c.2-.092.411-.161.628-.206l.088-.018c.218-.044.443-.066.67-.066h.052c.42 0 .83.076 1.216.224l.099.038c.218.083.428.188.625.314l.093.06c.21.134.407.284.588.45l.132.12c.168.153.322.319.46.494l.099.125c.138.175.26.363.364.561l.067.127c.105.198.192.406.26.621l.023.073c.068.21.103.427.103.649s-.035.439-.103.649l-.023.073c-.068.215-.155.423-.26.621l-.067.127c-.104.198-.226.386-.364.561l-.099.125c-.138.175-.292.341-.46.494l-.132.12c-.181.166-.378.316-.588.45l-.093.06c-.197.126-.407.231-.625.314l-.099.038c-.386.148-.796.224-1.216.224h-.052c-.227 0-.452-.022-.67-.066l-.088-.018c-.217-.045-.428-.114-.628-.206l-.093-.043c-.179-.083-.346-.183-.498-.3l-.152-.117c-.218-.169-.408-.363-.567-.577l-.092-.123c-.15-.203-.269-.424-.35-.658l-.03-.086a2.03 2.03 0 0 1-.103-.615z"/></svg></div>
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M13 12L21.5 22L20.5 22L13 13.2V22H12V2H13V12ZM13 2L4 12.5V2H3V22H4V13.8L12.5 2H13Z"/></svg></div>
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></div>
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M12 18.2c-3.4 0-6.2-2.8-6.2-6.2S8.6 5.8 12 5.8s6.2 2.8 6.2 6.2-2.8 6.2-6.2 6.2zm0-10.9c-2.6 0-4.7 2.1-4.7 4.7s2.1 4.7 4.7 4.7 4.7-2.1 4.7-4.7-2.1-4.7-4.7-4.7z"/><path d="M23.3 10.1l-1.3-.7c-.8-.4-1.7-.8-2.6-1.1l-.1-.1c-.9-.3-1.8-.6-2.8-.8l-1.2-.2c-.3 0-.5-.2-.5-.5s.2-.5.5-.5l1.2.2c1 .2 2 .5 3 .8l.1.1c.9.3 1.8.7 2.6 1.1l1.3.7c.3.2.4.5.2.8-.1.2-.4.3-.6.3l-.2-.1zM.7 13.9l1.3.7c.8.4 1.7.8 2.6 1.1l.1.1c.9.3 1.8.6 2.8.8l1.2.2c.3 0 .5.2.5.5s-.2.5-.5.5l-1.2-.2c-1-.2-2-.5-3-.8l-.1-.1c-.9-.3-1.8-.7-2.6-1.1l-1.3-.7c-.3-.2-.4-.5-.2-.8.1-.2.4-.3.6-.3l.2.1z"/><path d="M15.4 19.3l-.7-1.3c-.4-.8-.8-1.7-1.1-2.6l-.1-.1c-.3-.9-.6-1.8-.8-2.8l-.2-1.2c0-.3-.2-.5-.5-.5s-.5.2-.5.5l.2 1.2c.2 1 .5 2 .8 3l.1.1c.3.9.7 1.8 1.1 2.6l.7 1.3c.2.3.5.4.8.2.2-.1.3-.4.3-.6l-.1-.2zM8.6 4.7l.7 1.3c.4.8.8 1.7 1.1 2.6l.1.1c.3.9.6 1.8.8 2.8l.2 1.2c0 .3.2.5.5.5s.5-.2.5-.5l-.2-1.2c-.2-1-.5-2-.8-3l-.1-.1c-.3-.9-.7-1.8-1.1-2.6l-.7-1.3c-.2-.3-.5-.4-.8-.2-.2.1-.3.4-.3.6l.1.2z"/></svg></div>
+                <div class="scroller-logo"><svg viewBox="0 0 24 24"><path d="M12.001 2c-3.14 0-5.783 2.152-6.526 5.068a.5.5 0 0 0 .12.483l3.633 4.316a.5.5 0 0 0 .762.003L13.78 7.375c.088-.102.215-.161.35-.162l3.418-.03a.5.5 0 0 0 .44-.738C17.062 4.14 14.734 2 12.001 2zM3 12c0 4.418 4.03 8 9 8s9-3.582 9-8c0-1.428-.415-2.766-1.137-3.905a.5.5 0 0 0-.825-.018L14.76 13.91a.5.5 0 0 1-.76.002l-1.92-2.228a.5.5 0 0 0-.756.001L9.12 14.156a.5.5 0 0 1-.772-.016L4.03 8.358a.5.5 0 0 0-.84.053C3.064 9.516 3 10.732 3 12z"/></svg></div>
+            </div>
         </div>
-        <div class="text-[9px] md:text-[10px] text-[var(--text-muted)] tracking-[0.5em] uppercase font-bold">© MMXXVI Stephen James Morris — <span data-i18n="footer-suffix">FORGED IN THE VOID</span></div>
-    </footer>
+
+        <!-- The Gallery -->
+        <section id="gallery" class="py-24 px-4 max-w-6xl mx-auto relative gallery-container">
+            <div class="flex items-center gap-4 mb-20 justify-center text-center">
+                <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+                <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="nav-gallery">The Gallery</h2>
+                <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+            </div>
+            <div class="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6">
+                <div class="gallery-item aspect-[4/5] skeleton" onclick="openLightbox(this)">
+                    <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/Screenshot_2026-02-04-02-37-12-658_com.android.chrome-edit.jpg" onload="this.parentElement.classList.remove('skeleton')" alt="Art 1">
+                    <div class="gallery-overlay"><span class="text-[9px] sm:text-xs font-bold text-white uppercase" data-i18n="art-title1">Spectral Void UI</span></div>
+                </div>
+                <div class="gallery-item aspect-square skeleton" onclick="openLightbox(this)">
+                    <img src="https://images.unsplash.com/photo-1633167606207-d840b5070fc2?auto=format&fit=crop&q=80&w=800" onload="this.parentElement.classList.remove('skeleton')">
+                </div>
+                <div class="gallery-item aspect-[16/10] skeleton" onclick="openLightbox(this)">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800" onload="this.parentElement.classList.remove('skeleton')">
+                </div>
+                <div class="gallery-item aspect-square skeleton" onclick="openLightbox(this)">
+                    <img src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&q=80&w=800" onload="this.parentElement.classList.remove('skeleton')">
+                </div>
+                <div class="gallery-item aspect-square skeleton" onclick="openLightbox(this)">
+                    <img src="https://images.unsplash.com/photo-1635332252110-827252275218?auto=format&fit=crop&q=80&w=800" onload="this.parentElement.classList.remove('skeleton')">
+                </div>
+                <div class="gallery-item aspect-[1/1] skeleton" onclick="openLightbox(this)">
+                    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=800" onload="this.parentElement.classList.remove('skeleton')">
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="contact" class="py-32 px-4 text-center border-t border-[var(--glass-border)] bg-black/5">
+            <a href="#origins" class="inline-block group mb-8"><img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="h-24 md:h-32 w-auto mx-auto drop-shadow-2xl transition-all duration-500 group-hover:scale-110"></a>
+            <div class="footer-brand text-3xl md:text-5xl font-bold tracking-[0.6em] text-[var(--accent)] mb-12 uppercase italic transform -translate-y-2">SJM.DEV</div>
+            <div class="flex flex-wrap justify-center gap-6 md:gap-10 mb-12">
+                <a href="https://stephenjamesmorris.github.io" target="_blank" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg><span>GitHub</span></a>
+                <a href="https://linkedin.com/in/stephen-james-morris" target="_blank" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg><span>LinkedIn</span></a>
+                <a href="mailto:sjmorris@duck.com" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2 italic"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg><span>Email</span></a>
+            </div>
+            <div class="text-[9px] md:text-[10px] text-[var(--text-muted)] tracking-[0.5em] uppercase font-bold">© MMXXVI Stephen James Morris — <span data-i18n="footer-suffix">FORGED IN THE VOID</span></div>
+        </footer>
+    </div>
 
     <script>
         const translations = {
             en: {
-                "nav-origins": "Origins", "nav-about": "About", "nav-cv": "Chronicle", "nav-academy": "Academy", "nav-arsenal": "Arsenal", "nav-works": "Works", "nav-contact": "Contact",
-                "hero-tag": "IT Operations • Project Management • Creative Technologist", "hero-desc": "Bridging the gap between corporate architecture and immersive digital art. Specialized in managing high-performance digital projects and crafting creative user interfaces.",
+                "nav-origins": "Origins", "nav-about": "About", "nav-cv": "Chronicle", "nav-academy": "Academy", "nav-arsenal": "Arsenal", "nav-gallery": "Gallery", "nav-contact": "Contact",
+                "hero-tag": "IT Operations • Project Management • Creative Technologist", "hero-desc": "Bridging the gap between corporate architecture and immersive digital art.",
                 "about-title": "The Essence", "about-job-title": "Web Business Manager",
                 "about-label-name": "Name", "about-label-dob": "Birth", "about-label-address": "Address", "about-label-nat": "Nationality", "about-label-mobile": "Mobile", "about-label-email": "Email",
-                "about-val-nat": "German", "about-text-p1": "With over a decade of experience in IT operations and project management, I’ve navigated corporate environments while maintaining a deep passion for digital art.",
-                "about-text-p2": "My work is driven by structural precision and creative exploration.",
-                "cv-title": "The Chronicle", "job1-title": "Founder & Lead Developer", "job2-title": "Web Projekt Manager",
-                "skill-cat1": "Creative Technologist", "skill-cat2": "Management & Ops", "skill-cat3": "Design & Commerce", "skill-cat4": "Legacy & Artifacts",
+                "about-val-nat": "German", "about-text-p1": "Navigating corporate environments with a passion for digital art.",
+                "nav-gallery": "Gallery", "art-title1": "Spectral Void UI", "cv-title": "The Chronicle", 
+                "job1-title": "Founder & Lead Developer", "job2-title": "Web Projekt Manager", "job3-title": "Web Business Manager", "job4-title": "IT Support Manager", "job5-title": "Operations System Coordinator", "job6-title": "Owner / Publisher", "job7-title": "Regular Soldier", 
+                "edu1-title": "Web Business Management", "edu1-sub": "Diploma & Thesis, Webmasters Europe e.V.", "edu1-desc": "Completed under the supervision of GFN AG.",
+                "edu2-title": "Online Marketing Manager", "edu2-sub": "Webmasters Europe e.V.", "edu2-desc": "Certification in Online Marketing & Web Analytics.",
+                "edu3-title": "Web Interface Designer", "edu3-sub": "Webmasters Europe e.V.", "edu3-desc": "Certification in UI Design & Usability.",
+                "edu4-title": "Web Architect", "edu4-sub": "Webmasters Europe e.V.", "edu4-desc": "Certification in Website Conception & Project Management.",
+                "edu5-title": "PrestaShop Developer", "edu5-sub": "PrestaShop S.A.", "edu5-desc": "Certified Developer & Integrator Level 1.",
+                "edu6-title": "Verizon Enterprise Center", "edu6-sub": "Verizon Certification", "edu6-desc": "Certification in Verizon Enterprise Center Management.",
                 "footer-suffix": "FORGED IN THE VOID"
             },
             de: {
-                "nav-origins": "Ursprung", "nav-about": "Über mich", "nav-cv": "Chronik", "nav-academy": "Akademie", "nav-arsenal": "Arsenal", "nav-works": "Werke", "nav-contact": "Kontakt",
-                "hero-tag": "IT Operations • Projekt Management • Creative Technologist", "hero-desc": "Die Brücke zwischen Unternehmensarchitektur und immersiver digitaler Kunst. Spezialisiert auf das Management performanter Digitalprojekte und kreativer Interfaces.",
+                "nav-origins": "Ursprung", "nav-about": "Über mich", "nav-cv": "Chronik", "nav-academy": "Akademie", "nav-arsenal": "Arsenal", "nav-gallery": "Galerie", "nav-contact": "Kontakt",
+                "hero-tag": "IT Operations • Projekt Management • Creative Technologist", "hero-desc": "Die Brücke zwischen Unternehmensarchitektur und immersiver digitaler Kunst.",
                 "about-title": "Die Essenz", "about-job-title": "Web Business Manager",
-                "about-label-name": "Name", "about-label-dob": "Geburtsdatum", "about-label-address": "Adresse", "about-label-nat": "Nationalität", "about-label-mobile": "Mobil", "about-label-email": "Email",
-                "about-val-nat": "deutsch", "about-text-p1": "Mit über einem Jahrzehnt Erfahrung in IT-Operations und Projektmanagement habe ich Unternehmensumgebungen navigiert, während ich stets meine Leidenschaft für digitale Kunst bewahrt habe.",
-                "about-text-p2": "Meine Arbeit wird durch strukturelle Präzision und kreative Exploration angetrieben.",
-                "cv-title": "Die Chronik", "job1-title": "Gründer & Lead Developer", "job2-title": "Web Projekt Manager",
-                "skill-cat1": "Creative Technologist", "skill-cat2": "Management & Ops", "skill-cat3": "Design & Commerce", "skill-cat4": "Legacy & Artifacts",
+                "about-label-name": "Name", "about-label-dob": "Geburt", "about-label-address": "Adresse", "about-label-nat": "Nationalität", "about-label-mobile": "Mobil", "about-label-email": "Email",
+                "about-val-nat": "deutsch", "about-text-p1": "Navigiere durch Unternehmensebenen mit Leidenschaft für digitale Kunst.",
+                "nav-gallery": "Galerie", "art-title1": "Spectral Void UI", "cv-title": "Die Chronik", 
+                "job1-title": "Gründer & Lead Developer", "job2-title": "Web Projekt Manager", "job3-title": "Web Business Manager", "job4-title": "IT Support Manager", "job5-title": "Operations System Coordinator", "job6-title": "Inhaber / Verleger", "job7-title": "Soldat auf Zeit",
+                "edu1-title": "Web Business Management", "edu1-sub": "Diploma & Abschlussarbeit, Webmasters Europe e.V.", "edu1-desc": "Absolviert unter der Aufsicht der GFN AG.",
+                "edu2-title": "Online Marketing Manager", "edu2-sub": "Webmasters Europe e.V.", "edu2-desc": "Zertifizierung in Online Marketing & Web Analytics.",
+                "edu3-title": "Web Interface Designer", "edu3-sub": "Webmasters Europe e.V.", "edu3-desc": "Zertifizierung in UI Design & Usability.",
+                "edu4-title": "Web Architect", "edu4-sub": "Webmasters Europe e.V.", "edu4-desc": "Zertifizierung in Website-Konzeption & Projektmanagement.",
+                "edu5-title": "PrestaShop Entwickler", "edu5-sub": "PrestaShop S.A.", "edu5-desc": "Developer & Integrator Level 1 Zertifizierung.",
+                "edu6-title": "Verizon Enterprise Center", "edu6-sub": "Verizon Zertifizierung", "edu6-desc": "Zertifizierung in Verizon Enterprise Center Management.",
                 "footer-suffix": "IN DER LEERE GESCHMIEDET"
             }
         };
@@ -549,39 +734,37 @@
         let currentLang = 'en';
         let isDarkMode = true;
 
-        // --- Loader Logic ---
         function initLoader() {
             let percent = 0;
             const textEl = document.getElementById('loader-percent');
             const interval = setInterval(() => {
                 percent += Math.floor(Math.random() * 15) + 5;
-                if (percent >= 100) {
-                    percent = 100;
-                    clearInterval(interval);
-                }
+                if (percent >= 100) { percent = 100; clearInterval(interval); }
                 textEl.innerText = percent;
-            }, 100);
-
+            }, 80);
             window.onload = () => {
                 setTimeout(() => {
                     clearInterval(interval);
                     textEl.innerText = "100";
                     document.getElementById('loader-wrapper').classList.add('loaded');
-                }, 500);
+                    document.getElementById('main-content').classList.add('content-visible');
+                }, 600);
             };
         }
         initLoader();
 
-        // --- Constellation Logic ---
+        function openLightbox(el) {
+            const img = el.querySelector('img').src;
+            document.getElementById('lightbox-img').src = img;
+            document.getElementById('lightbox').style.display = 'flex';
+        }
+        function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
+
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let nodes = [];
-        const nodeCount = 80;
-        const connectionDistance = 140;
-        const mouse = { x: null, y: null, radius: 150 };
-
+        const mouse = { x: null, y: null };
         window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
-        window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
 
         class GeometricNode {
             constructor() { this.reset(); }
@@ -594,55 +777,45 @@
                 this.x += this.speedX; this.y += this.speedY;
                 if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
                 if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-                if (mouse.x !== null) {
-                    let dx = mouse.x - this.x; let dy = mouse.y - this.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < mouse.radius) {
-                        const force = (mouse.radius - dist) / mouse.radius;
-                        this.x -= (dx / dist) * force * 2; this.y -= (dy / dist) * force * 2;
-                    }
-                }
             }
-            draw() {
+            draw(nodeAlphaFactor) {
                 const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-                ctx.fillStyle = accent; ctx.globalAlpha = this.baseAlpha;
+                ctx.fillStyle = accent; ctx.globalAlpha = this.baseAlpha * nodeAlphaFactor;
                 ctx.fillRect(this.x, this.y, this.size, this.size);
             }
         }
 
         function initNodes() {
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            nodes = []; for (let i = 0; i < nodeCount; i++) nodes.push(new GeometricNode());
+            nodes = Array.from({length: 80}, () => new GeometricNode());
         }
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-            for (let i = 0; i < nodes.length; i++) {
-                nodes[i].update(); nodes[i].draw();
-                for (let j = i + 1; j < nodes.length; j++) {
-                    let dx = nodes[i].x - nodes[j].x; let dy = nodes[i].y - nodes[j].y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < connectionDistance) {
-                        ctx.strokeStyle = accent; ctx.globalAlpha = (1 - dist / connectionDistance) * 0.2;
-                        ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y);
-                        ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
+            const style = getComputedStyle(document.documentElement);
+            const accent = style.getPropertyValue('--accent').trim();
+            const lineAlphaFactor = parseFloat(style.getPropertyValue('--geom-line-alpha'));
+            const nodeAlphaFactor = parseFloat(style.getPropertyValue('--geom-node-alpha'));
+            nodes.forEach(n => {
+                n.update(); n.draw(nodeAlphaFactor);
+                nodes.forEach(m => {
+                    let d = Math.hypot(n.x - m.x, n.y - m.y);
+                    if (d < 140) {
+                        ctx.strokeStyle = accent; ctx.globalAlpha = (1 - d/140) * lineAlphaFactor;
+                        ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(m.x, m.y); ctx.stroke();
                     }
-                }
-            }
+                });
+            });
             requestAnimationFrame(animate);
         }
-
-        window.addEventListener('resize', initNodes);
         initNodes(); animate();
+        window.addEventListener('resize', initNodes);
 
-        // --- UI Logic ---
         function toggleTheme() {
             isDarkMode = !isDarkMode; document.body.classList.toggle('light-mode');
             const sunIcon = `<path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" />`;
             const moonIcon = `<path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>`;
             document.getElementById('theme-icon').innerHTML = isDarkMode ? moonIcon : sunIcon;
-            document.getElementById('theme-icon-mobile').innerHTML = isDarkMode ? moonIcon : sunIcon;
         }
 
         function toggleLanguage() { currentLang = currentLang === 'en' ? 'de' : 'en'; updateLanguage(); }
@@ -658,32 +831,20 @@
         function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
         window.onscroll = function() {
-            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let winScroll = document.documentElement.scrollTop;
             let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             document.getElementById("scroll-progress").style.width = (winScroll / height) * 100 + "%";
-            const btt = document.getElementById("back-to-top");
-            if (winScroll > 300) btt.classList.add("visible"); else btt.classList.remove("visible");
+            document.getElementById("back-to-top").classList.toggle("visible", winScroll > 300);
         };
 
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('opacity-100', 'translate-y-0'); });
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('opacity-100', 'translate-y-0'); });
         }, { threshold: 0.1 });
         document.querySelectorAll('section, header').forEach(el => {
-            el.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10'); observer.observe(el);
+            el.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
+            observer.observe(el);
         });
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            const btn = document.getElementById('sendBtn');
-            btn.innerText = currentLang === 'en' ? 'Transmitting...' : 'Wird übertragen...';
-            btn.disabled = true;
-            setTimeout(() => {
-                document.getElementById('form-feedback').classList.remove('hidden');
-                btn.innerText = translations[currentLang]["form-send"];
-                btn.disabled = false;
-                setTimeout(() => document.getElementById('form-feedback').classList.add('hidden'), 5000);
-            }, 1500);
-        }
     </script>
 </body>
 </html>
+
