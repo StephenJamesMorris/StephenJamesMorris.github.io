@@ -20,7 +20,7 @@
 <meta name="twitter:image" content="https://stephenjamesmorris.github.io/Screenshot_2026-02-04-02-37-12-658_com.android.chrome-edit.jpg">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-deep: #050a0f;
@@ -29,23 +29,23 @@
             --accent: #ffb443;
             --accent-glow: rgba(255, 180, 67, 0.4);
             --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.08);
             --overlay: rgba(0, 0, 0, 0.95);
-            --geom-line-alpha: 0.2;
-            --geom-node-alpha: 0.4;
+            --geom-line-alpha: 0.15;
+            --geom-node-alpha: 0.3;
         }
 
         .light-mode {
             --bg-deep: #ffffff;
             --text-main: #0f172a;
-            --text-muted: #334155;
-            --accent: #92400e;
-            --accent-glow: rgba(146, 64, 14, 0.2);
-            --glass: rgba(15, 23, 42, 0.04);
+            --text-muted: #475569;
+            --accent: #b45309;
+            --accent-glow: rgba(180, 83, 9, 0.2);
+            --glass: rgba(15, 23, 42, 0.03);
             --glass-border: rgba(15, 23, 42, 0.12);
             --overlay: rgba(255, 255, 255, 0.98);
-            --geom-line-alpha: 0.5;
-            --geom-node-alpha: 0.8;
+            --geom-line-alpha: 0.4;
+            --geom-node-alpha: 0.7;
         }
 
         body {
@@ -53,312 +53,251 @@
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
-            transition: background-color 0.5s ease, color 0.5s ease;
+            transition: background-color 0.6s ease;
         }
 
-        h1, h2, h3, .nav-item, .lang-toggle, .mobile-nav-item, .theme-toggle, .footer-brand, .loader-text {
+        h1, h2, h3, h4, .nav-item, .lang-toggle, .mobile-nav-item, .theme-toggle, .footer-brand, .loader-text {
             font-family: 'Cinzel', serif;
+            letter-spacing: 0.05em;
         }
 
-        /* --- Loading Screen --- */
+        /* --- Loader Styling --- */
         #loader-wrapper {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-deep);
+            inset: 0; background: var(--bg-deep);
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             z-index: 9999;
-            transition: opacity 0.8s cubic-bezier(0.77, 0, 0.175, 1), visibility 0.8s;
+            transition: opacity 1s cubic-bezier(0.77, 0, 0.175, 1), visibility 1s;
         }
         #loader-wrapper.loaded { opacity: 0; visibility: hidden; pointer-events: none; }
 
         .loader {
-            color: #fff;
-            font-family: Consolas, Menlo, Monaco, monospace;
+            color: var(--text-main);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-weight: bold;
-            font-size: 78px;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1.5rem;
+            font-size: clamp(40px, 10vw, 64px);
+            display: flex; align-items: center; gap: 2rem;
         }
-        .loader:before {
-            content: "{";
-            display: inline-block;
-            animation: pulse-bracket 0.4s alternate infinite ease-in-out;
-        }
-        .loader:after {
-            content: "}";
-            display: inline-block;
-            animation: pulse-bracket 0.4s 0.3s alternate infinite ease-in-out;
-        }
-        .loader-mid-logo {
-            height: 60px;
-            width: auto;
-            filter: drop-shadow(0 0 10px var(--accent-glow));
-        }
-        @keyframes pulse-bracket {
-            to { transform: scale(0.85); opacity: 0.5; }
-        }
+        .loader:before { content: "{"; animation: pulse-bracket 0.5s alternate infinite ease-in-out; }
+        .loader:after { content: "}"; animation: pulse-bracket 0.5s 0.25s alternate infinite ease-in-out; }
+        .loader-mid-logo { height: 50px; width: auto; filter: drop-shadow(0 0 15px var(--accent-glow)); }
+        @keyframes pulse-bracket { to { transform: scale(0.9); opacity: 0.4; } }
 
-        .loader-progress-text {
-            margin-top: 2rem;
-            font-size: 10px;
-            letter-spacing: 0.6em;
-            color: var(--accent);
-            text-transform: uppercase;
-            font-weight: bold;
-            font-family: 'Cinzel', serif;
-        }
-
-        /* --- Skeleton Loading --- */
-        .skeleton {
-            position: relative;
-            overflow: hidden;
-            background-color: var(--glass) !important;
-            border-color: var(--glass-border) !important;
-        }
+        /* --- Global Animations --- */
+        .skeleton { position: relative; overflow: hidden; background: var(--glass) !important; }
         .skeleton::after {
-            content: "";
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            transform: translateX(-100%);
+            content: ""; position: absolute; inset: 0; transform: translateX(-100%);
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-            animation: shimmer 1.5s infinite;
+            animation: shimmer 2s infinite;
         }
         @keyframes shimmer { 100% { transform: translateX(100%); } }
 
-        .content-hidden { opacity: 0; filter: blur(10px); transition: opacity 1s ease, filter 1s ease; }
+        .content-hidden { opacity: 0; filter: blur(15px); transition: opacity 1.2s ease, filter 1.2s ease; }
         .content-visible { opacity: 1; filter: blur(0); }
 
-        /* --- UI Elements --- */
-        #scroll-progress {
-            position: fixed;
-            top: 0; left: 0; height: 3px;
-            background: var(--accent);
-            width: 0%; z-index: 120;
-            box-shadow: 0 0 10px var(--accent-glow);
-            transition: width 0.1s ease-out;
-        }
-
-        #parallax-container {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; z-index: -1;
-            overflow: hidden; pointer-events: none;
-        }
-
-        #particle-canvas {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%; pointer-events: none; z-index: 1;
-        }
-
-        .rune-circle {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); width: 500px; height: 500px;
-            border: 1px solid var(--accent); opacity: 0.15;
-            border-radius: 50%; animation: rotate 40s linear infinite;
-        }
-
-        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
-
+        /* --- Glass Elements --- */
         .glass-panel {
             background: var(--glass);
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.1);
         }
 
         .glass-card {
             background: var(--glass);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--glass-border);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            cursor: pointer;
+            perspective: 1000px;
         }
-
         .glass-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3), 0 0 25px var(--accent-glow);
         }
 
-        .accent-glow { 
-            color: var(--accent);
-            text-shadow: 0 0 20px var(--accent-glow), 0 0 5px var(--accent);
+        /* The 3D Wobble Effect */
+        @keyframes glass-wobble {
+            0% { transform: translateY(-12px) scale(1.02) rotateX(0deg) rotateY(0deg); }
+            15% { transform: translateY(-12px) scale(1.02) rotateX(10deg) rotateY(-10deg); }
+            30% { transform: translateY(-12px) scale(1.02) rotateX(-8deg) rotateY(8deg); }
+            45% { transform: translateY(-12px) scale(1.02) rotateX(6deg) rotateY(-6deg); }
+            60% { transform: translateY(-12px) scale(1.02) rotateX(-4deg) rotateY(4deg); }
+            75% { transform: translateY(-12px) scale(1.02) rotateX(2deg) rotateY(-2deg); }
+            100% { transform: translateY(-12px) scale(1.02) rotateX(0deg) rotateY(0deg); }
         }
 
-        .timeline-line {
-            position: absolute; left: 20px; top: 0; bottom: 0; width: 1px;
-            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
-            opacity: 0.3;
+        .glass-card.active-glass {
+            backdrop-filter: blur(25px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent);
+            box-shadow: 0 0 40px var(--accent-glow);
+            animation: glass-wobble 0.8s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+            /* Maintain settled state transform after animation finishes */
+            transform: translateY(-12px) scale(1.02);
+        }
+        .light-mode .glass-card.active-glass {
+            background: rgba(15, 23, 42, 0.08);
         }
 
-        @media (min-width: 768px) { .timeline-line { left: 50%; } }
-
-        #back-to-top {
-            position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
-            opacity: 0; visibility: hidden; transform: translateY(20px);
-            transition: all 0.4s ease;
+        .profile-image-container {
+            position: relative; border-radius: 2rem; overflow: hidden;
+            border: 1px solid var(--glass-border); aspect-ratio: 1 / 1.25;
+            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        #back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+        .profile-image-container img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.8); transition: all 0.8s ease; }
+        .profile-image-container:hover { transform: translateY(-10px); border-color: var(--accent); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.5), 0 0 30px var(--accent-glow); }
+        .profile-image-container:hover img { filter: saturate(1.1); transform: scale(1.04); }
+
+        .skill-tag {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            padding: 0.7rem 1.3rem; border-radius: 0.5rem; font-size: 0.72rem;
+            text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600;
+            display: flex; align-items: center; gap: 0.6rem; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .skill-tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+        .skill-tag:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-4px); background: rgba(255, 180, 67, 0.05); }
+
+        .gallery-container { perspective: 1500px; }
+        .gallery-item {
+            position: relative; overflow: hidden; border-radius: 1rem;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1);
+            transform-style: preserve-3d; cursor: pointer;
+        }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-item:hover { transform: rotateY(10deg) rotateX(4deg) translateZ(30px); box-shadow: -20px 25px 50px rgba(0,0,0,0.4), 0 0 30px var(--accent-glow); border-color: var(--accent); z-index: 10; }
+        .gallery-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent 60%); opacity: 0; transition: opacity 0.5s ease; display: flex; align-items: flex-end; padding: 1.5rem; transform: translateZ(20px); }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+        .logo-scroller { width: 100%; overflow: hidden; padding: 4rem 0; mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent); }
+        .logo-track { display: flex; width: max-content; animation: scroll 40s linear infinite; gap: 7rem; align-items: center; }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .scroller-logo { height: 45px; opacity: 0.5; filter: grayscale(1); transition: 0.4s; }
+        .scroller-logo:hover { opacity: 1; filter: grayscale(0) drop-shadow(0 0 10px var(--accent-glow)); transform: scale(1.1); }
+        .scroller-logo img { height: 100%; width: auto; object-fit: contain; pointer-events: none; }
+
+        .accent-glow { color: var(--accent); text-shadow: 0 0 25px var(--accent-glow), 0 0 10px var(--accent); }
+
+        /* --- Mobile Navigation --- */
+        #menu-icon span { transition: 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6); width: 100%; height: 2px; border-radius: 99px; }
+        .menu-open #menu-icon span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .menu-open #menu-icon span:nth-child(2) { opacity: 0; transform: translateX(-10px); }
+        .menu-open #menu-icon span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
         #mobile-menu {
-            background: var(--overlay);
-            transform: translateY(-100%);
-            transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+            clip-path: circle(0% at 90% 5%);
         }
-        #mobile-menu.active { transform: translateY(0); }
+        #mobile-menu.active { clip-path: circle(150% at 90% 5%); }
 
-        .social-link { transition: all 0.3s ease; display: flex; align-items: center; gap: 0.5rem; }
-        .social-link:hover { transform: translateY(-3px); color: var(--accent); filter: drop-shadow(0 0 8px var(--accent-glow)); }
-
-        .logo-img { height: 42px; width: auto; filter: drop-shadow(0 0 5px var(--accent-glow)); transition: all 0.3s ease; }
-        .group:hover .logo-img { transform: scale(1.1); filter: drop-shadow(0 0 10px var(--accent)); }
-
-        /* --- Enhanced Profile Photo Style --- */
-        .profile-image-container {
-            position: relative; 
-            border-radius: 2rem; 
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
-            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-            background: var(--glass); 
-            border: 1px solid var(--glass-border);
-            aspect-ratio: 1 / 1.25;
-        }
-        .profile-image-container img { 
-            width: 100%; 
-            height: 100%; 
-            display: block; 
-            object-fit: cover;
-            filter: saturate(0.8) contrast(1.1);
-            transition: transform 0.8s ease, filter 0.8s ease;
-        }
-        .profile-image-container:hover { 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 30px var(--accent-glow); 
-            transform: translateY(-8px) scale(1.01); 
-            border-color: var(--accent);
-        }
-        .profile-image-container:hover img {
-            transform: scale(1.05);
-            filter: saturate(1.1) contrast(1.1);
-        }
-        .profile-image-container::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(5, 10, 15, 0.4) 0%, transparent 40%);
+        /* --- Fixed Background Structure --- */
+        #parallax-container {
+            position: fixed; 
+            top: 0; left: 0;
+            width: 100%; height: 100%; 
+            z-index: -1;
+            overflow: hidden; 
             pointer-events: none;
         }
 
-        /* --- Skill Tag Styles --- */
-        .skill-tag {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            padding: 0.6rem 1.2rem;
-            border-radius: 0.5rem;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            cursor: default;
+        #particle-canvas {
+            position: absolute; 
+            top: 0; left: 0;
+            width: 100%; height: 100%; 
+            pointer-events: auto;
+            z-index: 1;
         }
-        .skill-tag::before {
-            content: "";
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
+
+        .rune-circle {
+            position: absolute; 
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%); 
+            width: 500px; height: 500px;
+            border: 1px solid var(--accent); 
+            opacity: 0.15;
+            border-radius: 50%; 
+            animation: rotate-base 40s linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes rotate-base { 
+            from { transform: translate(-50%, -50%) rotate(0deg); } 
+            to { transform: translate(-50%, -50%) rotate(360deg); } 
+        }
+
+        .scanline { 
+            width: 100%; height: 100%; z-index: 5; pointer-events: none; 
+            background: linear-gradient(to bottom, transparent 0%, rgba(255,180,67,0.015) 50%, transparent 100%); 
+            position: fixed; top: 0; left: 0;
+            background-size: 100% 200px;
+            animation: scanline-move 10s linear infinite; 
+        }
+        @keyframes scanline-move { 0% { background-position: 0 -200px; } 100% { background-position: 0 100%; } }
+
+        #back-to-top {
+            position: fixed; 
+            bottom: 2rem; 
+            right: 2rem; 
+            z-index: 130;
+            opacity: 0; 
+            visibility: hidden; 
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        #back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        /* --- Modern Timeline Styling --- */
+        .timeline-container { position: relative; }
+        
+        .timeline-track {
+            position: absolute; left: 2.5rem; top: 0; bottom: 0; width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--accent) 5%, var(--accent) 95%, transparent);
+            opacity: 0.15;
+        }
+        @media (min-width: 768px) {
+            .timeline-track { left: 50%; transform: translateX(-50%); }
+        }
+
+        .timeline-node {
+            position: absolute; 
+            left: 2.5rem; 
+            top: 2rem; 
+            width: 14px; height: 14px;
+            background: var(--bg-deep); border: 2px solid var(--accent);
+            border-radius: 50%; transform: translateX(-50%); z-index: 10; 
+            box-shadow: 0 0 10px var(--accent-glow); transition: all 0.4s ease;
+        }
+        @media (min-width: 768px) {
+            .timeline-node { left: 50%; }
+        }
+
+        .glass-card:hover + .timeline-node, .glass-card.active-glass + .timeline-node {
+            box-shadow: 0 0 20px var(--accent);
             background: var(--accent);
-            box-shadow: 0 0 8px var(--accent);
-            transition: transform 0.3s ease;
+            transform: translateX(-50%) scale(1.3);
         }
-        .skill-tag:hover {
-            background: rgba(255, 180, 67, 0.08);
-            border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
-            transform: translateY(-3px);
-            color: var(--accent);
-        }
-        .skill-tag:hover::before { transform: scale(1.5); }
 
-        /* --- Scrolling Logos --- */
-        .logo-scroller {
-            width: 100%;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.15);
-            padding: 3rem 0;
-            position: relative;
-            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-        }
-        .logo-track {
-            display: flex;
-            width: max-content;
-            animation: scroll 40s linear infinite;
-            gap: 6rem;
+        .timeline-date-tag {
+            display: inline-flex;
             align-items: center;
-        }
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
-        .scroller-logo {
-            height: 40px;
-            min-width: 40px;
-            opacity: 0.6;
-            transition: all 0.4s ease;
-            filter: grayscale(1);
-        }
-        .scroller-logo:hover {
-            opacity: 1;
-            filter: grayscale(0) drop-shadow(0 0 10px var(--accent-glow));
-            transform: scale(1.15);
-        }
-        .scroller-logo img {
-            height: 100%;
-            width: auto;
-            object-fit: contain;
+            gap: 0.5rem;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            color: var(--accent);
+            background: rgba(255, 180, 67, 0.05);
+            border: 1px solid rgba(255, 180, 67, 0.15);
+            padding: 0.4rem 0.8rem;
+            border-radius: 99px;
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
         }
 
-        /* --- Gallery & 3D Cards --- */
-        .gallery-container { perspective: 1200px; }
-        .gallery-item {
-            position: relative; overflow: hidden; border-radius: 0.75rem;
-            cursor: pointer; background: var(--glass); border: 1px solid var(--glass-border);
-            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s ease;
-            transform-style: preserve-3d;
-        }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
-        .gallery-item:hover, .gallery-item:active {
-            transform: rotateY(12deg) rotateX(6deg) translateZ(40px);
-            box-shadow: -20px 20px 40px rgba(0,0,0,0.5), 0 0 25px var(--accent-glow);
-            border-color: var(--accent); z-index: 10;
-        }
-        .gallery-overlay {
-            position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
-            opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: flex-end; padding: 0.75rem;
-            transform: translateZ(25px);
-        }
-        .gallery-item:hover .gallery-overlay { opacity: 1; }
-
-        #lightbox {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(12px);
-            z-index: 10000; display: none; align-items: center; justify-content: center;
-            padding: 1.5rem; cursor: zoom-out;
-        }
+        #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(12px); z-index: 10000; display: none; align-items: center; justify-content: center; padding: 1.5rem; cursor: zoom-out; }
         #lightbox img { max-width: 95%; max-height: 85vh; border-radius: 0.5rem; }
-
-        .scanline {
-            width: 100%; height: 100px; z-index: 10;
-            background: linear-gradient(0deg, transparent 0%, rgba(255,180,67,0.02) 50%, transparent 100%);
-            position: fixed; top: -100px; animation: scanline 8s linear infinite; pointer-events: none;
-        }
-        @keyframes scanline { 0% { top: -100px; } 100% { top: 100%; } }
     </style>
 </head>
 <body class="antialiased">
@@ -369,211 +308,290 @@
             <div class="loader">
                 <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="SJM" class="loader-mid-logo">
             </div>
-            <div class="loader-progress-text">
-                <span id="loader-percent">0</span>% INITIALIZING
-            </div>
+            <div class="loader-progress-text"><span id="loader-percent">0</span>% INITIALIZING</div>
         </div>
     </div>
 
-    <!-- Lightbox Overlay -->
     <div id="lightbox" onclick="closeLightbox()">
         <img id="lightbox-img" src="" alt="Enlarged Artwork">
     </div>
 
     <div id="scroll-progress"></div>
 
+    <!-- Background Engine -->
     <div id="parallax-container">
         <canvas id="particle-canvas"></canvas>
-        <div class="rune-circle"></div>
+        <div class="rune-circle" id="parallax-rune"></div>
     </div>
     <div class="scanline"></div>
 
-    <button id="back-to-top" onclick="scrollToTop()" class="glass-panel p-4 rounded-full accent-glow">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    <button id="back-to-top" onclick="scrollToTop()" class="glass-panel p-4 rounded-full accent-glow transition-all active:scale-90" aria-label="Scroll to top">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
     </button>
 
     <!-- Navigation Bar -->
-    <nav class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-6xl px-6">
-        <div class="glass-panel rounded-full px-6 md:px-10 py-2.5 md:py-3.5 flex items-center justify-between">
+    <nav id="main-nav" class="fixed top-6 lg:top-12 left-1/2 -translate-x-1/2 z-[120] w-full max-w-6xl px-4 md:px-6 transition-all duration-700 lg:opacity-0 lg:-translate-y-12 lg:pointer-events-none">
+        <div class="glass-panel rounded-full px-5 md:px-10 py-3 flex items-center justify-between shadow-2xl">
             <div class="flex items-center">
                 <a href="#origins" class="outline-none group flex items-center gap-3">
-                    <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="logo-img">
-                    <div class="hidden sm:block md:hidden text-xl font-bold tracking-[0.2em] accent-glow">sjm.dev</div>
+                    <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="h-8 md:h-10 w-auto">
+                    <div class="sm:block md:hidden text-lg font-bold tracking-[0.2em] accent-glow">sjm.dev</div>
                 </a>
             </div>
 
-            <div class="hidden md:flex gap-6 lg:gap-8 items-center">
-                <a href="#origins" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-origins">Origins</a>
-                <a href="#about" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-about">About</a>
-                <a href="#cv" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-cv">Chronicle</a>
-                <a href="#academy" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-academy">Academy</a>
-                <a href="#arsenal" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-arsenal">Arsenal</a>
-                <a href="#gallery" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-gallery">Gallery</a>
-                <a href="#contact" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-contact">Contact</a>
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex gap-6 lg:gap-10 items-center">
+                <a href="#origins" class="nav-item text-[10px] uppercase tracking-widest hover:text-[var(--accent)] transition-colors" data-i18n="nav-origins">Origins</a>
+                <a href="#about" class="nav-item text-[10px] uppercase tracking-widest hover:text-[var(--accent)] transition-colors" data-i18n="nav-about">About</a>
+                <a href="#cv" class="nav-item text-[10px] uppercase tracking-widest hover:text-[var(--accent)] transition-colors" data-i18n="nav-cv">Chronicle</a>
+                <a href="#academy" class="nav-item text-[10px] uppercase tracking-widest hover:text-[var(--accent)] transition-colors" data-i18n="nav-academy">Academy</a>
+                <a href="#arsenal" class="nav-item text-[10px] uppercase tracking-widest hover:text-[var(--accent)] transition-colors" data-i18n="nav-arsenal">Arsenal</a>
+                <a href="#gallery" class="nav-item text-[10px] uppercase tracking-widest hover:text-[var(--accent)] transition-colors" data-i18n="nav-gallery">Gallery</a>
+                <a href="#contact" class="nav-item text-[10px] uppercase tracking-widest hover:text-[var(--accent)] transition-colors" data-i18n="nav-contact">Contact</a>
+                
                 <div class="h-5 w-[1px] bg-white/10 mx-1"></div>
+                
                 <div class="flex items-center gap-1.5">
-                    <button onclick="toggleTheme()" class="theme-toggle p-2 hover:scale-110 transition-transform outline-none">
+                    <button onclick="toggleTheme()" class="theme-toggle p-2 hover:scale-110 transition-transform outline-none" aria-label="Toggle Theme">
                         <svg id="theme-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                     </button>
-                    <button onclick="toggleLanguage()" class="lang-toggle text-[10px] uppercase tracking-[0.2em] font-bold outline-none min-w-[30px]" id="langBtn">DE</button>
+                    <button onclick="toggleLanguage()" class="lang-toggle text-[10px] uppercase font-bold outline-none min-w-[30px]" id="langBtn">DE</button>
                 </div>
             </div>
 
+            <!-- Mobile Toggle -->
             <div class="flex md:hidden items-center gap-3">
-                <button onclick="toggleTheme()" class="p-2 outline-none"><svg id="theme-icon-mobile" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg></button>
-                <button onclick="toggleLanguage()" class="lang-toggle text-[10px] uppercase tracking-[0.2em] font-bold outline-none" id="langBtnMobile">DE</button>
-                <button onclick="toggleMobileMenu()" class="outline-none"><svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg></button>
+                <button onclick="toggleTheme()" class="p-2 outline-none" aria-label="Toggle Theme"><svg id="theme-icon-mobile" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg></button>
+                <button onclick="toggleLanguage()" class="lang-toggle text-[10px] uppercase font-bold outline-none px-1" id="langBtnMobile">DE</button>
+                <button onclick="toggleMobileMenu()" class="outline-none p-2" id="burger-btn" aria-label="Toggle Menu">
+                    <div id="menu-icon" class="w-6 h-4 flex flex-col justify-between items-center text-[var(--text-main)]">
+                        <span class="bg-current"></span>
+                        <span class="bg-current"></span>
+                        <span class="bg-current"></span>
+                    </div>
+                </button>
             </div>
         </div>
     </nav>
 
     <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu" class="fixed inset-0 z-[90] flex flex-col items-center justify-center gap-8 md:hidden text-center px-4">
-        <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="w-24 h-auto mb-8 accent-glow">
-        <a href="#origins" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-origins">Origins</a>
-        <a href="#about" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-about">About</a>
-        <a href="#cv" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-cv">Chronicle</a>
-        <a href="#academy" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-academy">Academy</a>
-        <a href="#arsenal" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-arsenal">Arsenal</a>
-        <a href="#gallery" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-gallery">Gallery</a>
-        <a href="#contact" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-contact">Contact</a>
+    <div id="mobile-menu" class="fixed inset-0 z-[110] flex flex-col items-center justify-center gap-6 md:hidden text-center px-4 bg-[var(--overlay)] backdrop-blur-2xl">
+        <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="w-20 h-auto mb-6 accent-glow">
+        <div class="flex flex-col gap-6">
+            <a href="#origins" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-origins">Origins</a>
+            <a href="#about" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-about">About</a>
+            <a href="#cv" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-cv">Chronicle</a>
+            <a href="#academy" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-academy">Academy</a>
+            <a href="#arsenal" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-arsenal">Arsenal</a>
+            <a href="#gallery" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-gallery">Gallery</a>
+            <a href="#contact" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-contact">Contact</a>
+        </div>
     </div>
 
     <div id="main-content" class="content-hidden">
-        <header id="origins" class="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20">
-            <div class="mb-6 opacity-60 tracking-[0.5em] text-[10px] md:text-[11px] uppercase font-bold text-[var(--accent)]" data-i18n="hero-tag">IT Operations • Project Management • Creative Technologist</div>
-            <h1 class="text-4xl md:text-8xl font-bold mb-8 tracking-tighter leading-none">
-                STEPHEN JAMES<br>
-                <span class="accent-glow">MORRIS</span>
+        
+        <!-- Hero Section - Single Line Formatting for Wide Screens -->
+        <header id="origins" class="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-20">
+            <div class="mb-6 opacity-60 tracking-[0.6em] md:tracking-[0.8em] text-[9px] md:text-[11px] uppercase font-bold text-[var(--accent)]" data-i18n="hero-tag">IT Operations • Project Management • Creative Technologist</div>
+            <h1 class="text-5xl sm:text-6xl md:text-8xl lg:text-[8vw] font-bold mb-10 tracking-tight leading-[0.9] md:leading-[0.8] transition-all duration-700">
+                <span class="inline-block whitespace-nowrap">STEPHEN JAMES</span>
+                <br class="lg:hidden">
+                <span class="accent-glow tracking-tighter inline-block">MORRIS</span>
             </h1>
-            <div class="max-w-xl text-sm md:text-base text-[var(--text-muted)] mb-12 leading-relaxed font-semibold" data-i18n="hero-desc">
-                Bridging the gap between corporate architecture and immersive digital art. Specialized in managing high-performance digital projects and crafting creative user interfaces.
+            <div class="max-w-2xl lg:max-w-3xl text-sm md:text-lg text-[var(--text-muted)] mb-12 leading-relaxed font-medium" data-i18n="hero-desc">
+                Bridging the gap between corporate architecture and immersive digital art. Specialized in managing high-performance digital projects.
             </div>
+            <a href="#about" class="animate-bounce p-3 border border-[var(--glass-border)] rounded-full hover:border-[var(--accent)] transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 14l-7 7-7-7m14-8l-7 7-7-7"></path></svg>
+            </a>
         </header>
 
         <!-- The Essence -->
-        <section id="about" class="py-32 px-4 max-w-5xl mx-auto relative text-left">
-            <div class="flex items-center gap-4 mb-20 justify-center text-center">
-                <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+        <section id="about" class="py-24 md:py-32 px-4 max-w-6xl mx-auto relative text-left">
+            <div class="flex items-center gap-4 mb-16 md:20 justify-center text-center">
+                <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-40 flex-grow"></div>
                 <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="about-title">The Essence</h2>
-                <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+                <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-40 flex-grow"></div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-                <div class="glass-card p-8 rounded-3xl border-l-4 border-l-[var(--accent)] h-full">
-                    <h3 class="text-xl font-bold accent-glow mb-6 uppercase tracking-widest" data-i18n="about-job-title">Web Business Manager</h3>
-                    <div class="space-y-4 text-sm md:text-base mb-8">
-                        <div class="flex border-b border-[var(--glass-border)] pb-2"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-name">Name</span><span class="w-2/3 font-bold">Stephen James Morris</span></div>
-                        <div class="flex border-b border-[var(--glass-border)] pb-2"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-dob">Birth</span><span>25. February 1984</span></div>
-                        <div class="flex border-b border-[var(--glass-border)] pb-2"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-address">Address</span><span>Mahlerstraße 7a, 30989 Gehrden</span></div>
-                        <div class="flex border-b border-[var(--glass-border)] pb-2"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-nat">Nationality</span><span data-i18n="about-val-nat">German</span></div>
-                        <div class="flex border-b border-[var(--glass-border)] pb-2"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-mobile">Mobile</span><a href="tel:+4915236262894" class="font-bold">+49 (0)1523 6262894</a></div>
-                        <div class="flex"><span class="w-1/3 opacity-50 uppercase tracking-tighter text-[10px]" data-i18n="about-label-email">Email</span><a href="mailto:sjmorris@duck.com" class="font-bold italic">sjmorris@duck.com</a></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
+                <!-- Left Info Card -->
+                <div class="glass-card p-8 md:p-10 rounded-[2rem] border-l-4 border-l-[var(--accent)] flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold accent-glow mb-8 uppercase tracking-widest" data-i18n="about-job-title">Web Business Manager</h3>
+                        <div class="space-y-6 text-sm mb-10 text-left">
+                            <div class="flex border-b border-[var(--glass-border)] pb-3"><span class="w-1/3 opacity-50 uppercase tracking-widest text-[9px]" data-i18n="about-label-name">Name</span><span class="w-2/3 font-bold text-base leading-tight">Stephen James Morris</span></div>
+                            <div class="flex border-b border-[var(--glass-border)] pb-3"><span class="w-1/3 opacity-50 uppercase tracking-widest text-[9px]" data-i18n="about-label-dob">Birth</span><span>25. February 1984</span></div>
+                            <div class="flex border-b border-[var(--glass-border)] pb-3"><span class="w-1/3 opacity-50 uppercase tracking-widest text-[9px]" data-i18n="about-label-address">Address</span><span>Mahlerstraße 7a, 30989 Gehrden</span></div>
+                            <div class="flex border-b border-[var(--glass-border)] pb-3"><span class="w-1/3 opacity-50 uppercase tracking-widest text-[9px]" data-i18n="about-label-nat">Nationality</span><span data-i18n="about-val-nat">German</span></div>
+                            <div class="flex border-b border-[var(--glass-border)] pb-3"><span class="w-1/3 opacity-50 uppercase tracking-widest text-[9px]" data-i18n="about-label-mobile">Mobile</span><a href="tel:+4915236262894" class="font-bold">+49 (0)1523 6262894</a></div>
+                            <div class="flex"><span class="w-1/3 opacity-50 uppercase tracking-widest text-[9px]" data-i18n="about-label-email">Email</span><a href="mailto:sjmorris@duck.com" class="font-bold italic hover:text-[var(--accent)] transition-colors">sjmorris@duck.com</a></div>
+                        </div>
                     </div>
-
                     <div class="pt-6 border-t border-[var(--glass-border)] flex gap-6">
-                        <a href="https://stephenjamesmorris.github.io" target="_blank" class="social-link opacity-60 hover:opacity-100 transition-opacity">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                        </a>
-                        <a href="https://linkedin.com/in/stephen-james-morris" target="_blank" class="social-link opacity-60 hover:opacity-100 transition-opacity">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                        </a>
+                        <a href="https://stephenjamesmorris.github.io" target="_blank" class="social-link opacity-60 hover:opacity-100 transition-opacity"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+                        <a href="https://linkedin.com/in/stephen-james-morris" target="_blank" class="social-link opacity-60 hover:opacity-100 transition-opacity"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
                     </div>
                 </div>
-                <div class="space-y-6">
-                    <div class="profile-image-container skeleton">
+
+                <div class="flex flex-col gap-8 md:gap-12 h-full">
+                    <div class="profile-image-container skeleton flex-grow min-h-[300px]">
                         <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/IMG_20260125_212028.png" alt="Profile" onload="this.parentElement.classList.remove('skeleton')">
                     </div>
-                    <div class="glass-card p-6 rounded-2xl">
-                        <p class="text-base leading-relaxed text-[var(--text-main)] font-medium mb-4" data-i18n="about-text-p1">With over a decade of experience in IT operations and project management, I’ve navigated corporate environments while maintaining a deep passion for digital art.</p>
+                    <div class="glass-card p-8 rounded-[2rem] text-left">
+                        <p class="text-base leading-relaxed text-[var(--text-main)] font-medium" data-i18n="about-text-p1">With over a decade of experience in IT operations and project management, I’ve navigated corporate environments while maintaining a deep passion for digital art.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- The Chronicle -->
-        <section id="cv" class="py-24 px-4 max-w-5xl mx-auto relative text-left">
-            <div class="flex items-center gap-4 mb-20 justify-center text-center">
+        <section id="cv" class="py-32 px-4 max-w-5xl mx-auto relative text-left">
+            <div class="flex items-center gap-4 mb-24 justify-center text-center">
                 <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-40 flex-grow"></div>
                 <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="cv-title">The Chronicle</h2>
                 <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-40 flex-grow"></div>
             </div>
-            <div class="relative">
-                <div class="timeline-line"></div>
-                <div class="mb-16 flex flex-col md:flex-row items-center w-full">
-                    <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2018 — 2026</span></div>
-                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] shadow-[0_0_15px_var(--accent)] border-4 border-[var(--bg-deep)]"></div>
-                    <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job1-title">Founder & Lead Developer</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase">Morris Digital</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job1-desc">Establishing a creative digital agency specialized in design and software implementations.</p></div></div>
+            
+            <div class="timeline-container relative">
+                <div class="timeline-track"></div>
+
+                <!-- Milestone 1 -->
+                <div class="mb-24 relative flex flex-col md:flex-row items-center w-full">
+                    <div class="timeline-node"></div>
+                    <div class="w-full md:w-1/2 md:pl-16 flex flex-col items-start md:items-start pl-16">
+                        <div class="md:hidden mb-4"><div class="timeline-date-tag !mb-0">2018 — 2026</div></div>
+                        <div class="glass-card p-8 rounded-2xl w-full" onclick="selectChronicleCard(this)">
+                            <div class="hidden md:inline-flex timeline-date-tag">2018 — 2026</div>
+                            <h3 class="text-xl font-bold mb-1 uppercase tracking-wider text-[var(--accent)] text-left" data-i18n="job1-title">Founder & Lead Developer</h3>
+                            <div class="text-[11px] text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase text-left">Morris Digital</div>
+                            <p class="text-sm text-[var(--text-muted)] leading-relaxed text-left" data-i18n="job1-desc">Establishing a creative digital agency specialized in design and software implementations.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full">
-                    <div class="hidden md:block w-1/2 pl-12 text-left"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2016 — 2017</span></div>
-                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-60 border-4 border-[var(--bg-deep)]"></div>
-                    <div class="w-full md:w-1/2 md:pr-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl text-left md:text-right"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job2-title">Web Projekt Manager</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase">Shisha Bong Club, Hannover</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job2-desc">Creating and executing e-commerce online strategies.</p></div></div>
+
+                <!-- Milestone 2 -->
+                <div class="mb-24 relative flex flex-col md:flex-row-reverse items-center w-full">
+                    <div class="timeline-node"></div>
+                    <div class="w-full md:w-1/2 md:pr-16 flex flex-col items-start md:items-end pl-16 md:pl-0 md:pr-16">
+                        <div class="md:hidden mb-4"><div class="timeline-date-tag !mb-0">2016 — 2017</div></div>
+                        <div class="glass-card p-8 rounded-2xl text-left md:text-right w-full" onclick="selectChronicleCard(this)">
+                            <div class="hidden md:inline-flex timeline-date-tag">2016 — 2017</div>
+                            <h3 class="text-xl font-bold mb-1 uppercase tracking-wider text-left md:text-right" data-i18n="job2-title">Web Projekt Manager</h3>
+                            <div class="text-[11px] text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase text-left md:text-right">Shisha Bong Club, Hannover</div>
+                            <p class="text-sm text-[var(--text-muted)] leading-relaxed text-left md:text-right" data-i18n="job2-desc">Creating and executing e-commerce online strategies.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-16 flex flex-col md:flex-row items-center w-full text-left">
-                    <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2015 — 2017</span></div>
-                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-50 border-4 border-[var(--bg-deep)]"></div>
-                    <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job3-title">Web Business Manager</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase">eSmoker Warehouse, Hannover</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job3-desc">IT infrastructure and international customer correspondence.</p></div></div>
+
+                <!-- Milestone 3 -->
+                <div class="mb-24 relative flex flex-col md:flex-row items-center w-full">
+                    <div class="timeline-node"></div>
+                    <div class="w-full md:w-1/2 md:pl-16 flex flex-col items-start md:items-start pl-16">
+                        <div class="md:hidden mb-4"><div class="timeline-date-tag !mb-0">2015 — 2017</div></div>
+                        <div class="glass-card p-8 rounded-2xl w-full text-left" onclick="selectChronicleCard(this)">
+                            <div class="hidden md:inline-flex timeline-date-tag">2015 — 2017</div>
+                            <h3 class="text-xl font-bold mb-1 uppercase tracking-wider text-[var(--accent)] text-left" data-i18n="job3-title">Web Business Manager</h3>
+                            <div class="text-[11px] text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase text-left">eSmoker Warehouse, Hannover</div>
+                            <p class="text-sm text-[var(--text-muted)] leading-relaxed text-left" data-i18n="job3-desc">IT infrastructure and international customer correspondence.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full text-left">
-                    <div class="hidden md:block w-1/2 pl-12 text-left"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2013 — 2014</span></div>
-                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-40 border-4 border-[var(--bg-deep)]"></div>
-                    <div class="w-full md:w-1/2 md:pr-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl text-left md:text-right"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job4-title">IT Support Manager</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase">silbersaiten GbR</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job4-desc">Coordinating development teams and quality checks.</p></div></div>
+
+                <!-- Milestone 4 -->
+                <div class="mb-24 relative flex flex-col md:flex-row-reverse items-center w-full">
+                    <div class="timeline-node"></div>
+                    <div class="w-full md:w-1/2 md:pr-16 flex flex-col items-start md:items-end pl-16 md:pl-0 md:pr-16">
+                        <div class="md:hidden mb-4"><div class="timeline-date-tag !mb-0">2013 — 2014</div></div>
+                        <div class="glass-card p-8 rounded-2xl text-left md:text-right w-full" onclick="selectChronicleCard(this)">
+                            <div class="hidden md:inline-flex timeline-date-tag">2013 — 2014</div>
+                            <h3 class="text-xl font-bold mb-1 uppercase tracking-wider" data-i18n="job4-title">IT Support Manager</h3>
+                            <div class="text-[11px] text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase">silbersaiten GbR</div>
+                            <p class="text-sm text-[var(--text-muted)] leading-relaxed text-left md:text-right" data-i18n="job4-desc">Coordinating development teams and quality checks.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-16 flex flex-col md:flex-row items-center w-full text-left">
-                    <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2012 — 2013</span></div>
-                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-30 border-4 border-[var(--bg-deep)]"></div>
-                    <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl text-left"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job5-title">Operations System Coordinator</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase">syncreon Deutschland GmbH</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job5-desc">IT support coordination for VW & Audi.</p></div></div>
+
+                <!-- Milestone 5 -->
+                <div class="mb-24 relative flex flex-col md:flex-row items-center w-full">
+                    <div class="timeline-node"></div>
+                    <div class="w-full md:w-1/2 md:pl-16 flex flex-col items-start md:items-start pl-16">
+                        <div class="md:hidden mb-4"><div class="timeline-date-tag !mb-0">2012 — 2013</div></div>
+                        <div class="glass-card p-8 rounded-2xl w-full text-left" onclick="selectChronicleCard(this)">
+                            <div class="hidden md:inline-flex timeline-date-tag">2012 — 2013</div>
+                            <h3 class="text-xl font-bold mb-1 uppercase tracking-wider" data-i18n="job5-title">Operations System Coordinator</h3>
+                            <div class="text-[11px] text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase">syncreon Deutschland GmbH</div>
+                            <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job5-desc">IT support coordination for VW & Audi.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full text-left">
-                    <div class="hidden md:block w-1/2 pl-12 text-left"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2006 — 2011</span></div>
-                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-20 border-4 border-[var(--bg-deep)]"></div>
-                    <div class="w-full md:w-1/2 md:pr-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl text-left md:text-right"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job6-title">Owner / Publisher</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase">The Opinion News, SA</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job6-desc">Lifestyle and nature conservation magazine in South Africa.</p></div></div>
+
+                <!-- Milestone 6 -->
+                <div class="mb-24 relative flex flex-col md:flex-row-reverse items-center w-full text-left">
+                    <div class="timeline-node"></div>
+                    <div class="w-full md:w-1/2 md:pr-16 flex flex-col items-start md:items-end pl-16 md:pl-0 md:pr-16">
+                        <div class="md:hidden mb-4"><div class="timeline-date-tag !mb-0">2006 — 2011</div></div>
+                        <div class="glass-card p-8 rounded-2xl text-left md:text-right w-full" onclick="selectChronicleCard(this)">
+                            <div class="hidden md:inline-flex timeline-date-tag">2006 — 2011</div>
+                            <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job6-title">Owner / Publisher</h3>
+                            <div class="text-[11px] text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase text-left md:text-right">The Opinion News, SA</div>
+                            <p class="text-sm text-[var(--text-muted)] leading-relaxed text-left md:text-right" data-i18n="job6-desc">Lifestyle and nature conservation magazine in South Africa.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="mb-16 flex flex-col md:flex-row items-center w-full text-left">
-                    <div class="hidden md:block w-1/2 pr-12 text-right"><span class="text-[var(--accent)] font-bold tracking-widest text-sm">2001 — 2004</span></div>
-                    <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-10 border-4 border-[var(--bg-deep)]"></div>
-                    <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0"><div class="glass-card p-6 rounded-2xl text-left"><h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job7-title">Regular Soldier</h3><div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase">TrspHubschrRgt 10, Faßberg</div><p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job7-desc">Staff service in Human Resources.</p></div></div>
+
+                <!-- Milestone 7 -->
+                <div class="mb-24 relative flex flex-col md:flex-row items-center w-full text-left">
+                    <div class="timeline-node"></div>
+                    <div class="w-full md:w-1/2 md:pl-16 flex flex-col items-start md:items-start pl-16">
+                        <div class="md:hidden mb-4"><div class="timeline-date-tag !mb-0">2001 — 2004</div></div>
+                        <div class="glass-card p-8 rounded-2xl w-full text-left" onclick="selectChronicleCard(this)">
+                            <div class="hidden md:inline-flex timeline-date-tag">2001 — 2004</div>
+                            <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job7-title">Regular Soldier</h3>
+                            <div class="text-[11px] text-[var(--text-muted)] mb-4 tracking-widest font-bold uppercase text-left">TrspHubschrRgt 10, Faßberg</div>
+                            <p class="text-sm text-[var(--text-muted)] leading-relaxed text-left" data-i18n="job7-desc">Staff service in Human Resources.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Academy -->
-        <section id="academy" class="py-24 px-4 max-w-6xl mx-auto relative">
+        <section id="academy" class="py-32 px-4 max-w-6xl mx-auto relative">
             <div class="flex items-center gap-4 mb-20 justify-center text-center">
                 <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-40 flex-grow"></div>
                 <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="nav-academy">The Academy</h2>
                 <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-40 flex-grow"></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="glass-card p-8 rounded-[2rem] md:col-span-2 border-t-2 border-t-[var(--accent)] text-left">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3">
-                        <h3 class="text-xl font-bold uppercase tracking-wider" data-i18n="edu1-title">Web Business Management</h3>
-                        <span class="text-[var(--accent)] text-[10px] font-bold px-3 py-1 bg-[var(--accent)]/10 rounded-full">2016 — 2017</span>
+                <div class="glass-card p-10 rounded-[2.5rem] md:col-span-2 border-t-2 border-t-[var(--accent)] text-left">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-3 text-left">
+                        <h3 class="text-2xl font-bold uppercase tracking-wider leading-tight text-left" data-i18n="edu1-title">Web Business Management</h3>
+                        <span class="text-[var(--accent)] text-xs font-bold px-4 py-1.5 bg-[var(--accent)]/10 border border-[var(--accent)]/20 rounded-full shrink-0">2016 — 2017</span>
                     </div>
-                    <p class="text-xs opacity-60 italic mb-4 font-semibold" data-i18n="edu1-sub">Diploma & Thesis, Webmasters Europe e.V.</p>
-                    <p class="text-sm leading-relaxed opacity-80" data-i18n="edu1-desc">Completed under the supervision of GFN AG.</p>
+                    <p class="text-xs opacity-60 italic mb-6 font-semibold text-left" data-i18n="edu1-sub">Diploma & Thesis, Webmasters Europe e.V.</p>
+                    <p class="text-sm leading-relaxed opacity-80 text-left" data-i18n="edu1-desc">Completed under the supervision of GFN AG.</p>
                 </div>
-                <div class="glass-card p-8 rounded-[2rem] text-left">
+                <div class="glass-card p-10 rounded-[2.5rem] text-left">
                     <div class="text-[var(--accent)] text-[10px] font-bold mb-3">2016</div>
                     <h4 class="text-base font-bold uppercase mb-3 tracking-wider leading-snug" data-i18n="edu2-title">Online Marketing Manager</h4>
                     <p class="text-xs opacity-70" data-i18n="edu2-desc">Webmasters Europe e.V.</p>
                 </div>
-                <div class="glass-card p-8 rounded-[2rem] text-left">
+                <div class="glass-card p-10 rounded-[2.5rem] text-left">
                     <div class="text-[var(--accent)] text-[10px] font-bold mb-3">2016</div>
                     <h4 class="text-base font-bold uppercase mb-3 tracking-wider leading-snug" data-i18n="edu3-title">Web Interface Designer</h4>
                     <p class="text-xs opacity-70" data-i18n="edu3-desc">Webmasters Europe e.V.</p>
                 </div>
-                <div class="glass-card p-8 rounded-[2rem] text-left">
+                <div class="glass-card p-10 rounded-[2.5rem] text-left">
                     <div class="text-[var(--accent)] text-[10px] font-bold mb-3">2016</div>
                     <h4 class="text-base font-bold uppercase mb-3 tracking-wider leading-snug" data-i18n="edu4-title">Web Architect</h4>
                     <p class="text-xs opacity-70" data-i18n="edu4-desc">Webmasters Europe e.V.</p>
                 </div>
-                <div class="glass-card p-8 rounded-[2rem] text-left">
+                <div class="glass-card p-10 rounded-[2.5rem] text-left">
                     <div class="text-[var(--accent)] text-[10px] font-bold mb-3">2013</div>
                     <h4 class="text-base font-bold uppercase mb-3 tracking-wider leading-snug" data-i18n="edu5-title">PrestaShop Developer</h4>
                     <p class="text-xs opacity-70" data-i18n="edu5-desc">Certified Level 1.</p>
                 </div>
-                <div class="glass-card p-8 rounded-[2rem] text-left">
+                <div class="glass-card p-10 rounded-[2.5rem] text-left">
                     <div class="text-[var(--accent)] text-[10px] font-bold mb-3">2013</div>
                     <h4 class="text-base font-bold uppercase mb-3 tracking-wider leading-snug" data-i18n="edu6-title">Verizon Enterprise Center</h4>
                     <p class="text-xs opacity-70" data-i18n="edu6-desc">Verizon Certification</p>
@@ -615,26 +633,21 @@
                 <div class="scroller-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub"></div>
                 <div class="scroller-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React"></div>
                 <div class="scroller-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP"></div>
-                <!-- Duplicate -->
                 <div class="scroller-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" alt="Node.js"></div>
                 <div class="scroller-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5"></div>
                 <div class="scroller-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3"></div>
                 <div class="scroller-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JS"></div>
-                <div class="scroller-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" alt="Next.js"></div>
-                <div class="scroller-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" alt="GitHub"></div>
-                <div class="scroller-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" alt="React"></div>
-                <div class="scroller-logo"><img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg" alt="PHP"></div>
             </div>
         </div>
 
         <!-- The Gallery -->
-        <section id="gallery" class="py-24 px-4 max-w-6xl mx-auto relative gallery-container">
+        <section id="gallery" class="py-32 px-4 max-w-6xl mx-auto relative gallery-container">
             <div class="flex items-center gap-4 mb-20 justify-center text-center">
                 <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-40 flex-grow"></div>
-                <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="nav-gallery">The Gallery</h2>
+                <h2 class="text-2xl md:text-3xl uppercase tracking-[0.5em] font-bold" data-i18n="nav-gallery">The Gallery</h2>
                 <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-40 flex-grow"></div>
             </div>
-            <div class="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6">
+            <div class="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                 <div class="gallery-item aspect-[4/5] skeleton" onclick="openLightbox(this)">
                     <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/Screenshot_2026-02-04-02-37-12-658_com.android.chrome-edit.jpg" onload="this.parentElement.classList.remove('skeleton')" alt="Art 1">
                     <div class="gallery-overlay"><span class="text-[9px] sm:text-xs font-bold text-white uppercase" data-i18n="art-title1">Spectral Void UI</span></div>
@@ -649,11 +662,11 @@
 
         <!-- Footer -->
         <footer id="contact" class="py-32 px-4 text-center border-t border-[var(--glass-border)] bg-black/5">
-            <a href="#origins" class="inline-block group mb-8"><img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="h-24 md:h-32 w-auto mx-auto drop-shadow-2xl transition-all duration-500 group-hover:scale-110"></a>
-            <div class="footer-brand text-3xl md:text-5xl font-bold tracking-[0.6em] text-[var(--accent)] mb-12 uppercase italic transform -translate-y-2">SJM.DEV</div>
+            <a href="#origins" class="inline-block group mb-8 transition-transform hover:scale-110"><img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="h-24 md:h-32 w-auto mx-auto drop-shadow-2xl"></a>
+            <div class="footer-brand text-3xl md:text-5xl font-bold tracking-[0.6em] text-[var(--accent)] mb-12 uppercase italic transform -translate-y-2 text-center">SJM.DEV</div>
             <div class="flex flex-wrap justify-center gap-6 md:gap-10 mb-12">
-                <a href="https://stephenjamesmorris.github.io" target="_blank" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg><span>GitHub</span></a>
-                <a href="https://linkedin.com/in/stephen-james-morris" target="_blank" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg><span>LinkedIn</span></a>
+                <a href="https://stephenjamesmorris.github.io" target="_blank" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2 italic transition-all hover:text-[var(--accent)]"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg><span>GitHub</span></a>
+                <a href="https://linkedin.com/in/stephen-james-morris" target="_blank" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2 italic transition-all hover:text-[var(--accent)]"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg><span>LinkedIn</span></a>
                 <a href="mailto:sjmorris@duck.com" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2 italic transition-all hover:text-[var(--accent)]"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg><span>Email</span></a>
             </div>
             <div class="text-[9px] md:text-[10px] text-[var(--text-muted)] tracking-[0.5em] uppercase font-bold">© MMXXVI Stephen James Morris — <span data-i18n="footer-suffix">FORGED IN THE VOID</span></div>
@@ -671,7 +684,11 @@
                 "nav-gallery": "Gallery", "art-title1": "Spectral Void UI", "cv-title": "The Chronicle", 
                 "job1-title": "Founder & Lead Developer", "job2-title": "Web Projekt Manager", "job3-title": "Web Business Manager", "job4-title": "IT Support Manager", "job5-title": "Operations System Coordinator", "job6-title": "Owner / Publisher", "job7-title": "Regular Soldier", 
                 "edu1-title": "Web Business Management", "edu1-sub": "Diploma & Thesis, Webmasters Europe e.V.", "edu1-desc": "Completed under the supervision of GFN AG.",
-                "edu2-title": "Online Marketing Manager", "edu3-title": "Web Interface Designer", "edu4-title": "Web Architect", "edu5-title": "PrestaShop Developer", "edu6-title": "Verizon Enterprise Center",
+                "edu2-title": "Online Marketing Manager", "edu2-sub": "Webmasters Europe e.V.", "edu2-desc": "Certification in Online Marketing & Web Analytics.",
+                "edu3-title": "Web Interface Designer", "edu3-sub": "Webmasters Europe e.V.", "edu3-desc": "Certification in UI Design & Usability.",
+                "edu4-title": "Web Architect", "edu4-sub": "Webmasters Europe e.V.", "edu4-desc": "Certification in Website Conception & Project Management.",
+                "edu5-title": "PrestaShop Developer", "edu5-sub": "PrestaShop S.A.", "edu5-desc": "Certified Level 1 Integrator.",
+                "edu6-title": "Verizon Enterprise Center", "edu6-sub": "Verizon Certification", "edu6-desc": "Verizon Enterprise Center Management.",
                 "footer-suffix": "FORGED IN THE VOID"
             },
             de: {
@@ -683,13 +700,18 @@
                 "nav-gallery": "Galerie", "art-title1": "Spectral Void UI", "cv-title": "Die Chronik", 
                 "job1-title": "Gründer & Lead Developer", "job2-title": "Web Projekt Manager", "job3-title": "Web Business Manager", "job4-title": "IT Support Manager", "job5-title": "Operations System Coordinator", "job6-title": "Inhaber / Verleger", "job7-title": "Soldat auf Zeit",
                 "edu1-title": "Web Business Management", "edu1-sub": "Diploma & Abschlussarbeit, Webmasters Europe e.V.", "edu1-desc": "Absolviert unter der Aufsicht der GFN AG.",
-                "edu2-title": "Online Marketing Manager", "edu3-title": "Web Interface Designer", "edu4-title": "Web Architect", "edu5-title": "PrestaShop Entwickler", "edu6-title": "Verizon Enterprise Center",
+                "edu2-title": "Online Marketing Manager", "edu2-sub": "Webmasters Europe e.V.", "edu2-desc": "Zertifizierung in Online Marketing & Web Analytics.",
+                "edu3-title": "Web Interface Designer", "edu3-sub": "Webmasters Europe e.V.", "edu3-desc": "Zertifizierung in UI Design & Usability.",
+                "edu4-title": "Web Architect", "edu4-sub": "Webmasters Europe e.V.", "edu4-desc": "Zertifizierung in Website-Konzeption & Projektmanagement.",
+                "edu5-title": "PrestaShop Entwickler", "edu5-sub": "PrestaShop S.A.", "edu5-desc": "Developer & Integrator Level 1 Zertifizierung.",
+                "edu6-title": "Verizon Enterprise Center", "edu6-sub": "Verizon Zertifizierung", "edu6-desc": "Zertifizierung in Verizon Enterprise Center Management.",
                 "footer-suffix": "IN DER LEERE GESCHMIEDET"
             }
         };
 
         let currentLang = 'en';
         let isDarkMode = true;
+        let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
 
         function initLoader() {
             let percent = 0;
@@ -705,6 +727,7 @@
                     textEl.innerText = "100";
                     document.getElementById('loader-wrapper').classList.add('loaded');
                     document.getElementById('main-content').classList.add('content-visible');
+                    updateNavVisibility();
                 }, 600);
             };
         }
@@ -717,12 +740,25 @@
         }
         function closeLightbox() { document.getElementById('lightbox').style.display = 'none'; }
 
-        // --- Constellation Engine ---
+        function selectChronicleCard(el) {
+            const cards = document.querySelectorAll('#cv .glass-card');
+            const isAlreadyActive = el.classList.contains('active-glass');
+            
+            cards.forEach(c => c.classList.remove('active-glass'));
+            
+            if (!isAlreadyActive) {
+                el.classList.add('active-glass');
+            }
+        }
+
         const canvas = document.getElementById('particle-canvas');
         const ctx = canvas.getContext('2d');
         let nodes = [];
         const mouse = { x: null, y: null };
-        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('mousemove', (e) => { 
+            mouse.x = e.clientX; 
+            mouse.y = e.clientY; 
+        });
 
         class GeometricNode {
             constructor() { this.reset(); }
@@ -732,12 +768,22 @@
                 this.speedY = (Math.random() - 0.5) * 0.4; this.baseAlpha = Math.random() * 0.4 + 0.1;
             }
             update() {
-                this.x += this.speedX; this.y += this.speedY;
                 if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
                 if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+
+                if (mouse.x !== null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.hypot(dx, dy);
+                    if (distance < 150) {
+                        let force = (150 - distance) / 150;
+                        this.x -= (dx / distance) * force * 3;
+                        this.y -= (dy / distance) * force * 3;
+                    }
+                }
+                this.x += this.speedX; this.y += this.speedY;
             }
-            draw(nodeAlphaFactor) {
-                const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+            draw(accent, nodeAlphaFactor) {
                 ctx.fillStyle = accent; ctx.globalAlpha = this.baseAlpha * nodeAlphaFactor;
                 ctx.fillRect(this.x, this.y, this.size, this.size);
             }
@@ -754,8 +800,9 @@
             const accent = style.getPropertyValue('--accent').trim();
             const lineAlphaFactor = parseFloat(style.getPropertyValue('--geom-line-alpha'));
             const nodeAlphaFactor = parseFloat(style.getPropertyValue('--geom-node-alpha'));
+
             nodes.forEach(n => {
-                n.update(); n.draw(nodeAlphaFactor);
+                n.update(); n.draw(accent, nodeAlphaFactor);
                 nodes.forEach(m => {
                     let d = Math.hypot(n.x - m.x, n.y - m.y);
                     if (d < 150) {
@@ -763,6 +810,19 @@
                         ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(m.x, m.y); ctx.stroke();
                     }
                 });
+
+                if (mouse.x !== null) {
+                    let dMouse = Math.hypot(n.x - mouse.x, n.y - mouse.y);
+                    if (dMouse < 180) {
+                        ctx.strokeStyle = accent;
+                        ctx.globalAlpha = (1 - dMouse/180) * lineAlphaFactor * 1.5;
+                        ctx.lineWidth = 0.7;
+                        ctx.beginPath();
+                        ctx.moveTo(mouse.x, mouse.y);
+                        ctx.lineTo(n.x, n.y);
+                        ctx.stroke();
+                    }
+                }
             });
             requestAnimationFrame(animate);
         }
@@ -796,11 +856,40 @@
 
         function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
+        function updateNavVisibility() {
+            const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+            const nav = document.getElementById('main-nav');
+            const isWide = window.innerWidth >= 1024;
+
+            if (!isWide) {
+                nav.classList.remove('lg:opacity-0', 'lg:-translate-y-12', 'lg:pointer-events-none');
+                nav.classList.remove('lg:opacity-100', 'lg:translate-y-0', 'lg:pointer-events-auto');
+                return;
+            }
+
+            if (currentScrollY > 150) {
+                if (currentScrollY < lastScrollY) {
+                    nav.classList.remove('lg:opacity-0', 'lg:-translate-y-12', 'lg:pointer-events-none');
+                    nav.classList.add('lg:opacity-100', 'lg:translate-y-0', 'lg:pointer-events-auto');
+                } else {
+                    nav.classList.add('lg:opacity-0', 'lg:-translate-y-12', 'lg:pointer-events-none');
+                    nav.classList.remove('lg:opacity-100', 'lg:translate-y-0', 'lg:pointer-events-auto');
+                }
+            } else {
+                nav.classList.add('lg:opacity-0', 'lg:-translate-y-12', 'lg:pointer-events-none');
+                nav.classList.remove('lg:opacity-100', 'lg:translate-y-0', 'lg:pointer-events-auto');
+            }
+            lastScrollY = currentScrollY;
+        }
+
         window.onscroll = function() {
-            let winScroll = document.documentElement.scrollTop;
+            let winScroll = window.pageYOffset || document.documentElement.scrollTop;
             let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             document.getElementById("scroll-progress").style.width = (winScroll / height) * 100 + "%";
-            document.getElementById("back-to-top").classList.toggle("visible", winScroll > 300);
+            document.getElementById("back-to-top").classList.toggle("visible", winScroll > 400);
+            updateNavVisibility();
+            const rune = document.getElementById('parallax-rune');
+            if (rune) { rune.style.transform = `translate(-50%, calc(-50% + ${winScroll * 0.12}px)) rotate(${winScroll * 0.05}deg)`; }
         };
 
         const observer = new IntersectionObserver((entries) => {
@@ -813,3 +902,4 @@
     </script>
 </body>
 </html>
+
