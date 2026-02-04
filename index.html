@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sjm.dev | Stephen James Morris</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050a0f;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #ffb443;
+            --accent-glow: rgba(255, 180, 67, 0.3);
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --overlay: rgba(0, 0, 0, 0.95);
+        }
+
+        .light-mode {
+            --bg-deep: #fcf8f1;
+            --text-main: #1a202c;
+            --text-muted: #4a5568;
+            --accent: #b45309;
+            --accent-glow: rgba(180, 83, 9, 0.2);
+            --glass: rgba(0, 0, 0, 0.03);
+            --glass-border: rgba(0, 0, 0, 0.15);
+            --overlay: rgba(252, 248, 241, 0.98);
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        h1, h2, h3, .nav-item, .lang-toggle, .mobile-nav-item, .theme-toggle {
+            font-family: 'Cinzel', serif;
+        }
+
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent);
+            width: 0%;
+            z-index: 120;
+            box-shadow: 0 0 10px var(--accent-glow);
+            transition: width 0.1s ease-out;
+        }
+
+        #parallax-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .layer {
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.1s ease-out;
+        }
+
+        .layer-stars {
+            background-image: radial-gradient(circle at center, var(--text-muted) 1px, transparent 1px);
+            background-size: 100px 100px;
+            opacity: 0.1;
+        }
+
+        .light-mode .layer-stars { opacity: 0.3; }
+
+        .rune-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            border: 1px solid var(--accent);
+            opacity: 0.1;
+            border-radius: 50%;
+            animation: rotate 60s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .accent-glow {
+            text-shadow: 0 0 15px var(--accent-glow), 0 0 5px var(--accent);
+            color: var(--accent);
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+            opacity: 0.3;
+        }
+
+        @media (min-width: 768px) {
+            .timeline-line { left: 50%; }
+        }
+
+        #back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+        }
+
+        #back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .scanline {
+            width: 100%; height: 100px; z-index: 10;
+            background: linear-gradient(0deg, transparent 0%, rgba(255,180,67,0.02) 50%, transparent 100%);
+            position: fixed; top: -100px; animation: scanline 8s linear infinite; pointer-events: none;
+        }
+
+        @keyframes scanline { 0% { top: -100px; } 100% { top: 100%; } }
+        
+        #mobile-menu {
+            background: var(--overlay);
+            transform: translateY(-100%);
+            transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+        }
+        #mobile-menu.active {
+            transform: translateY(0);
+        }
+
+        .social-link {
+            transition: all 0.3s ease;
+        }
+        .social-link:hover {
+            transform: translateY(-3px);
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
+
+        input, textarea {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid var(--glass-border) !important;
+            color: var(--text-main) !important;
+            transition: all 0.3s ease !important;
+        }
+        input:focus, textarea:focus {
+            outline: none !important;
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 15px var(--accent-glow) !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        .skill-tag {
+            background: rgba(255, 180, 67, 0.05);
+            border: 1px solid rgba(255, 180, 67, 0.1);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+        .skill-tag:hover {
+            border-color: var(--accent);
+            background: rgba(255, 180, 67, 0.15);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="scroll-progress"></div>
+
+    <div id="parallax-container">
+        <canvas id="particle-canvas"></canvas>
+        <div class="layer layer-nebula" data-speed="0.02"></div>
+        <div class="layer layer-stars" data-speed="0.05"></div>
+        <div class="rune-circle"></div>
+        <div class="layer bg-gradient-to-b from-transparent via-transparent to-[var(--bg-deep)]" data-speed="0"></div>
+    </div>
+    <div class="scanline"></div>
+
+    <button id="back-to-top" onclick="scrollToTop()" class="glass-panel p-4 rounded-full accent-glow hover:scale-110 active:scale-95 transition-all">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
+    <nav class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-5xl px-4">
+        <div class="glass-panel rounded-full px-6 md:px-8 py-2 md:py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <a href="#origins" class="outline-none group">
+                    <div class="text-xl font-bold tracking-[0.3em] accent-glow">SJM.DEV</div>
+                </a>
+            </div>
+            
+            <div class="hidden md:flex gap-6 items-center">
+                <a href="#origins" class="nav-item text-[10px] uppercase tracking-widest hover:text-white transition-colors" data-i18n="nav-origins">Origins</a>
+                <a href="#cv" class="nav-item text-[10px] uppercase tracking-widest hover:text-white transition-colors" data-i18n="nav-cv">Chronicle</a>
+                <a href="#academy" class="nav-item text-[10px] uppercase tracking-widest hover:text-white transition-colors" data-i18n="nav-academy">Academy</a>
+                <a href="#arsenal" class="nav-item text-[10px] uppercase tracking-widest hover:text-white transition-colors" data-i18n="nav-arsenal">Arsenal</a>
+                <a href="#projects" class="nav-item text-[10px] uppercase tracking-widest hover:text-white transition-colors" data-i18n="nav-works">Works</a>
+                <a href="#contact" class="nav-item text-[10px] uppercase tracking-widest hover:text-white transition-colors" data-i18n="nav-contact">Contact</a>
+                
+                <div class="h-4 w-[1px] bg-white/10 mx-1"></div>
+                
+                <button onclick="toggleTheme()" class="theme-toggle p-2 hover:scale-110 transition-transform outline-none">
+                    <svg id="theme-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </button>
+
+                <button onclick="toggleLanguage()" class="lang-toggle text-[10px] uppercase tracking-[0.2em] font-bold outline-none min-w-[30px]" id="langBtn">DE</button>
+            </div>
+
+            <div class="flex md:hidden items-center gap-3">
+                <button onclick="toggleTheme()" class="p-2 outline-none"><svg id="theme-icon-mobile" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg></button>
+                <button onclick="toggleLanguage()" class="lang-toggle text-[10px] uppercase tracking-[0.2em] font-bold outline-none" id="langBtnMobile">DE</button>
+                <button onclick="toggleMobileMenu()" class="outline-none">
+                    <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="fixed inset-0 z-[90] flex flex-col items-center justify-center gap-8 md:hidden text-center px-4">
+        <div class="text-3xl font-bold tracking-[0.4em] accent-glow mb-8">SJM.DEV</div>
+        <a href="#origins" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-origins">Origins</a>
+        <a href="#cv" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-cv">Chronicle</a>
+        <a href="#academy" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-academy">Academy</a>
+        <a href="#arsenal" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-arsenal">Arsenal</a>
+        <a href="#projects" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-works">Works</a>
+        <a href="#contact" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-contact">Contact</a>
+    </div>
+
+    <!-- Hero Section -->
+    <header id="origins" class="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20">
+        <div class="mb-6 opacity-50 tracking-[0.5em] text-[10px] uppercase" data-i18n="hero-tag">IT Operations • Project Management • Creative Technologist</div>
+        <h1 class="text-4xl md:text-8xl font-bold mb-8 tracking-tighter leading-none">
+            STEPHEN JAMES<br>
+            <span class="accent-glow">MORRIS</span>
+        </h1>
+        <div class="max-w-xl text-sm md:text-base text-[var(--text-muted)] mb-12 leading-relaxed" data-i18n="hero-desc">
+            Bridging the gap between corporate architecture and immersive digital art. Specialized in managing high-performance digital projects and crafting creative user interfaces.
+        </div>
+    </header>
+
+    <!-- The Chronicle -->
+    <section id="cv" class="py-24 px-4 max-w-5xl mx-auto relative">
+        <div class="flex items-center gap-4 mb-20 justify-center text-center">
+            <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+            <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="cv-title">The Chronicle</h2>
+            <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+        </div>
+
+        <div class="relative">
+            <div class="timeline-line"></div>
+            
+            <div class="mb-16 flex flex-col md:flex-row items-center w-full">
+                <div class="hidden md:block w-1/2 pr-12 text-right">
+                    <span class="text-[var(--accent)] font-bold tracking-widest text-sm">2018 — 2020</span>
+                </div>
+                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] shadow-[0_0_15px_var(--accent)] border-4 border-[var(--bg-deep)]"></div>
+                <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0">
+                    <div class="glass-card p-6 rounded-2xl text-left">
+                        <span class="md:hidden block text-[var(--accent)] text-[10px] font-bold mb-2">2018 — 2020</span>
+                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job1-title">Founder & Lead Developer</h3>
+                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest">Morris Digital</div>
+                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job1-desc">Establishing a creative digital agency specialized in responsive web design, branding, and custom software implementations for SMEs.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full">
+                <div class="hidden md:block w-1/2 pl-12 text-left">
+                    <span class="text-[var(--accent)] font-bold tracking-widest text-sm">2016 — 2017</span>
+                </div>
+                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-60 border-4 border-[var(--bg-deep)]"></div>
+                <div class="w-full md:w-1/2 md:pr-12 mt-4 md:mt-0">
+                    <div class="glass-card p-6 rounded-2xl text-left md:text-right">
+                        <span class="md:hidden block text-[var(--accent)] text-[10px] font-bold mb-2">2016 — 2017</span>
+                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job2-title">Web Projekt Manager</h3>
+                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest">Shisha Bong Club, Hannover</div>
+                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job2-desc">Creating and executing e-commerce online strategies.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-16 flex flex-col md:flex-row items-center w-full">
+                <div class="hidden md:block w-1/2 pr-12 text-right">
+                    <span class="text-[var(--accent)] font-bold tracking-widest text-sm">2015 — 2017</span>
+                </div>
+                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-50 border-4 border-[var(--bg-deep)]"></div>
+                <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0">
+                    <div class="glass-card p-6 rounded-2xl text-left">
+                        <span class="md:hidden block text-[var(--accent)] text-[10px] font-bold mb-2">2015 — 2017</span>
+                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job3-title">Web Business Manager</h3>
+                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest">eSmoker Warehouse, Hannover</div>
+                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job3-desc">Responsible for IT infrastructure, e-commerce systems, template design and international customer correspondence.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full">
+                <div class="hidden md:block w-1/2 pl-12 text-left">
+                    <span class="text-[var(--accent)] font-bold tracking-widest text-sm">2013 — 2014</span>
+                </div>
+                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-40 border-4 border-[var(--bg-deep)]"></div>
+                <div class="w-full md:w-1/2 md:pr-12 mt-4 md:mt-0">
+                    <div class="glass-card p-6 rounded-2xl text-left md:text-right">
+                        <span class="md:hidden block text-[var(--accent)] text-[10px] font-bold mb-2">2013 — 2014</span>
+                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job4-title">IT Support Manager</h3>
+                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest">silbersaiten - Bangiev & Bangiev GbR</div>
+                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job4-desc">IT support for modules & systems. Coordinating support to development teams and quality checks.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-16 flex flex-col md:flex-row items-center w-full">
+                <div class="hidden md:block w-1/2 pr-12 text-right">
+                    <span class="text-[var(--accent)] font-bold tracking-widest text-sm">2012 — 2013</span>
+                </div>
+                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-30 border-4 border-[var(--bg-deep)]"></div>
+                <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0">
+                    <div class="glass-card p-6 rounded-2xl text-left">
+                        <span class="md:hidden block text-[var(--accent)] text-[10px] font-bold mb-2">2012 — 2013</span>
+                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job5-title">Operations System Coordinator</h3>
+                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest">syncreon Deutschland GmbH</div>
+                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job5-desc">IT support coordination for VW & Audi, resource monitoring, and hardware management.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-16 flex flex-col md:flex-row-reverse items-center w-full">
+                <div class="hidden md:block w-1/2 pl-12 text-left">
+                    <span class="text-[var(--accent)] font-bold tracking-widest text-sm">2006 — 2011</span>
+                </div>
+                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-20 border-4 border-[var(--bg-deep)]"></div>
+                <div class="w-full md:w-1/2 md:pr-12 mt-4 md:mt-0">
+                    <div class="glass-card p-6 rounded-2xl text-left md:text-right">
+                        <span class="md:hidden block text-[var(--accent)] text-[10px] font-bold mb-2">2006 — 2011</span>
+                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job6-title">Owner / Publisher</h3>
+                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest">The Opinion News cc, South Africa</div>
+                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job6-desc">Local free newspaper and magazine covering tourism, lifestyle and nature conservation in Kokstad, SA.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-16 flex flex-col md:flex-row items-center w-full">
+                <div class="hidden md:block w-1/2 pr-12 text-right">
+                    <span class="text-[var(--accent)] font-bold tracking-widest text-sm">2001 — 2004</span>
+                </div>
+                <div class="z-10 w-4 h-4 rounded-full bg-[var(--accent)] opacity-10 border-4 border-[var(--bg-deep)]"></div>
+                <div class="w-full md:w-1/2 md:pl-12 mt-4 md:mt-0">
+                    <div class="glass-card p-6 rounded-2xl text-left">
+                        <span class="md:hidden block text-[var(--accent)] text-[10px] font-bold mb-2">2001 — 2004</span>
+                        <h3 class="text-lg font-bold mb-1 uppercase tracking-wider" data-i18n="job7-title">Regular Soldier</h3>
+                        <div class="text-xs text-[var(--text-muted)] mb-4 tracking-widest">TrspHubschrRgt 10, Faßberg</div>
+                        <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="job7-desc">Staff service in HR/Personnel at the Transport Helicopter Regiment 10.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Academy -->
+    <section id="academy" class="py-24 px-4 max-w-6xl mx-auto relative">
+        <div class="flex items-center gap-4 mb-20 justify-center text-center">
+            <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+            <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="nav-academy">The Academy</h2>
+            <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="glass-card p-8 rounded-3xl flex flex-col h-full border-t-2 border-t-[var(--accent)]/30">
+                <div class="text-[var(--accent)] font-bold text-xs tracking-widest mb-2">2016 — 2017</div>
+                <h3 class="text-lg font-bold uppercase mb-2 tracking-wider" data-i18n="edu1-title">Web Business Management</h3>
+                <div class="text-[10px] opacity-60 mb-4" data-i18n="edu1-inst">Diploma, Webmasters Europe e.V.</div>
+                <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="edu1-desc">Diploma graduation thesis.</p>
+            </div>
+            <div class="glass-card p-8 rounded-3xl flex flex-col h-full">
+                <div class="text-[var(--accent)] font-bold text-xs tracking-widest mb-2">2016</div>
+                <h3 class="text-lg font-bold uppercase mb-2 tracking-wider" data-i18n="edu2-title">Online Marketing Manager</h3>
+                <div class="text-[10px] opacity-60 mb-4" data-i18n="edu2-inst">Certificate, Webmasters Europe e.V.</div>
+                <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="edu2-desc">Online Marketing & Web Analytics.</p>
+            </div>
+            <div class="glass-card p-8 rounded-3xl flex flex-col h-full">
+                <div class="text-[var(--accent)] font-bold text-xs tracking-widest mb-2">2016</div>
+                <h3 class="text-lg font-bold uppercase mb-2 tracking-wider" data-i18n="edu3-title">Web Interface Designer</h3>
+                <div class="text-[10px] opacity-60 mb-4" data-i18n="edu3-inst">Certificate, Webmasters Europe e.V.</div>
+                <p class="text-sm text-[var(--text-muted)] leading-relaxed" data-i18n="edu3-desc">Interface Design & Usability.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Arsenal (Skills Section) -->
+    <section id="arsenal" class="py-24 px-4 max-w-6xl mx-auto relative">
+        <div class="flex items-center gap-4 mb-20 justify-center text-center">
+            <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+            <h2 class="text-2xl md:text-3xl uppercase tracking-[0.4em] font-bold" data-i18n="nav-arsenal">The Arsenal</h2>
+            <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="glass-card p-8 rounded-3xl">
+                <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat1">Creative Technologist</h3>
+                <div class="flex flex-wrap gap-3">
+                    <span class="skill-tag">Three.js</span>
+                    <span class="skill-tag">React Fiber</span>
+                    <span class="skill-tag">WebGL</span>
+                    <span class="skill-tag">GLSL Shaders</span>
+                    <span class="skill-tag">TypeScript</span>
+                    <span class="skill-tag">JavaScript ES6+</span>
+                    <span class="skill-tag">Tailwind CSS</span>
+                    <span class="skill-tag">HTML5 / CSS3</span>
+                    <span class="skill-tag">Node.js</span>
+                </div>
+            </div>
+
+            <div class="glass-card p-8 rounded-3xl">
+                <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat2">Management & Ops</h3>
+                <div class="flex flex-wrap gap-3">
+                    <span class="skill-tag">Product Ownership</span>
+                    <span class="skill-tag">Project Lead</span>
+                    <span class="skill-tag">Agile Methodologies</span>
+                    <span class="skill-tag">Scrum / Kanban</span>
+                    <span class="skill-tag">e-Commerce Strategy</span>
+                    <span class="skill-tag">IT Operations</span>
+                    <span class="skill-tag">Business Process</span>
+                    <span class="skill-tag">SME Consulting</span>
+                </div>
+            </div>
+
+            <div class="glass-card p-8 rounded-3xl">
+                <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat3">Design & Commerce</h3>
+                <div class="flex flex-wrap gap-3">
+                    <span class="skill-tag">UI/UX Design</span>
+                    <span class="skill-tag">Web Architecture</span>
+                    <span class="skill-tag">PrestaShop</span>
+                    <span class="skill-tag">Webmasters Europe</span>
+                    <span class="skill-tag">Online Marketing</span>
+                    <span class="skill-tag">Web Analytics</span>
+                    <span class="skill-tag">Branding</span>
+                    <span class="skill-tag">Responsive Design</span>
+                </div>
+            </div>
+
+            <div class="glass-card p-8 rounded-3xl">
+                <h3 class="text-xl font-bold uppercase tracking-[0.2em] mb-8 accent-glow" data-i18n="skill-cat4">Legacy & Artifacts</h3>
+                <div class="flex flex-wrap gap-3">
+                    <span class="skill-tag">C++</span>
+                    <span class="skill-tag">Server Admin</span>
+                    <span class="skill-tag">Hardware Mgmt</span>
+                    <span class="skill-tag">Helpdesk Ops</span>
+                    <span class="skill-tag">Print Media</span>
+                    <span class="skill-tag">Quality Control</span>
+                    <span class="skill-tag">System Coordination</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Works -->
+    <section id="projects" class="py-24 px-4 max-w-6xl mx-auto">
+        <div class="flex items-center gap-4 mb-12">
+            <h2 class="text-2xl uppercase tracking-[0.3em] font-bold" data-i18n="works-title">Works</h2>
+            <div class="h-[1px] bg-gradient-to-r from-[var(--accent)] to-transparent opacity-50 flex-grow"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="glass-panel p-8 rounded-2xl group relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl font-serif italic">I</div>
+                <h3 class="text-xl font-bold mb-4 accent-glow uppercase tracking-widest">Spectral UI</h3>
+                <p class="text-sm text-[var(--text-muted)] mb-6" data-i18n="proj1-desc">Experimental 3D user interface framework leveraging R3F.</p>
+                <div class="flex gap-2">
+                    <span class="px-3 py-1 bg-white/5 rounded-full text-[9px] uppercase tracking-tighter">React</span>
+                    <span class="px-3 py-1 bg-white/5 rounded-full text-[9px] uppercase tracking-tighter">R3F</span>
+                </div>
+            </div>
+            <div class="glass-panel p-8 rounded-2xl group relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl font-serif italic">II</div>
+                <h3 class="text-xl font-bold mb-4 accent-glow uppercase tracking-widest">Automotive OS</h3>
+                <p class="text-sm text-[var(--text-muted)] mb-6" data-i18n="proj2-desc">Dashboard visualization concept.</p>
+                <div class="flex gap-2">
+                    <span class="px-3 py-1 bg-white/5 rounded-full text-[9px] uppercase tracking-tighter">WebGL</span>
+                    <span class="px-3 py-1 bg-white/5 rounded-full text-[9px] uppercase tracking-tighter">Node.js</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer & Contact -->
+    <footer id="contact" class="py-24 px-4 text-center border-t border-[var(--glass-border)] bg-black/5">
+        <div class="text-2xl font-bold tracking-[0.4em] accent-glow mb-8">SJM.DEV</div>
+        <div class="mb-12 opacity-30 text-[10px] tracking-[1em] uppercase" data-i18n="contact-tag">Establish Connection</div>
+        
+        <div class="max-w-2xl mx-auto mb-20">
+            <div class="glass-card p-8 rounded-3xl text-left">
+                <form id="contact-form" onsubmit="handleFormSubmit(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-widest mb-2 opacity-50" data-i18n="form-name">Name</label>
+                            <input type="text" id="name" required class="w-full px-4 py-3 rounded-xl">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase tracking-widest mb-2 opacity-50" data-i18n="form-email">Email</label>
+                            <input type="email" id="email" required class="w-full px-4 py-3 rounded-xl">
+                        </div>
+                    </div>
+                    <div class="mb-8">
+                        <label class="block text-[10px] uppercase tracking-widest mb-2 opacity-50" data-i18n="form-message">Message</label>
+                        <textarea id="message" rows="4" required class="w-full px-4 py-3 rounded-xl resize-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full glass-panel py-4 rounded-xl accent-glow font-bold uppercase tracking-[0.3em] text-xs transition-all" id="sendBtn" data-i18n="form-send">Send Signal</button>
+                    <div id="form-feedback" class="hidden text-center mt-6 text-[10px] uppercase tracking-widest accent-glow animate-pulse" data-i18n="form-success">Message transmitted through the void</div>
+                </form>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-6 md:gap-10 mb-12">
+            <a href="https://github.com/some1dark" target="_blank" class="social-link flex items-center gap-2 hover:text-[var(--accent)] transition-colors uppercase text-[10px] md:text-xs tracking-widest font-bold">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                <span>GitHub</span>
+            </a>
+            <a href="#" target="_blank" class="social-link flex items-center gap-2 hover:text-[var(--accent)] transition-colors uppercase text-[10px] md:text-xs tracking-widest font-bold">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                <span>LinkedIn</span>
+            </a>
+            <a href="#" class="social-link flex items-center gap-2 hover:text-[var(--accent)] transition-colors uppercase text-[10px] md:text-xs tracking-widest font-bold">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <span>Email</span>
+            </a>
+        </div>
+
+        <div class="text-[9px] md:text-[10px] text-[var(--text-muted)] tracking-[0.5em] uppercase">
+            © MMXXVI Stephen James Morris — <span data-i18n="footer-suffix">FORGED IN THE VOID</span>
+        </div>
+    </footer>
+
+    <script>
+        const translations = {
+            en: {
+                "nav-origins": "Origins", "nav-cv": "Chronicle", "nav-academy": "Academy", "nav-arsenal": "Arsenal", "nav-works": "Works", "nav-contact": "Contact",
+                "hero-tag": "IT Operations • Project Management • Creative Technologist",
+                "hero-desc": "Bridging the gap between corporate architecture and immersive digital art. Specialized in managing high-performance digital projects and crafting creative user interfaces.",
+                "cv-title": "The Chronicle", "now": "NOW",
+                "job1-title": "Founder & Lead Developer", "job1-desc": "Establishing a creative digital agency...",
+                "job2-title": "Web Project Manager", "job2-desc": "Creating e-commerce online strategies.",
+                "job3-title": "Web Business Manager", "job3-desc": "Responsible for IT infrastructure and e-commerce systems.",
+                "job4-title": "IT Support Manager", "job4-desc": "IT support for modules & Shop2Go systems.",
+                "job5-title": "Operations System Coordinator", "job5-desc": "IT support coordination for VW & Audi.",
+                "job6-title": "Owner / Publisher", "job6-desc": "Local newspaper in South Africa.",
+                "job7-title": "Regular Soldier", "job7-desc": "Staff service in HR at Helicopter Regiment 10.",
+                "edu1-title": "Web Business Management", "edu1-inst": "Diploma, Webmasters Europe e.V.", "edu1-desc": "Diploma graduation thesis.",
+                "edu2-title": "Online Marketing Manager", "edu2-inst": "Certification, Webmasters Europe e.V.", "edu2-desc": "Online Marketing & Web Analytics.",
+                "edu3-title": "Web Interface Designer", "edu3-inst": "Certification, Webmasters Europe e.V.", "edu3-desc": "Interface Design & Usability.",
+                "nav-academy": "Academy", "skill-cat1": "Creative Technologist", "skill-cat2": "Management & Ops", "skill-cat3": "Design & Commerce", "skill-cat4": "Legacy & Artifacts",
+                "works-title": "Works", "proj1-desc": "3D UI Framework leveraging R3F.", "proj2-desc": "Dashboard synchronization concept.",
+                "contact-tag": "Establish Connection", "form-name": "Name", "form-email": "Email", "form-message": "Message", "form-send": "Send Signal", "form-success": "Message transmitted through the void", "footer-suffix": "FORGED IN THE VOID"
+            },
+            de: {
+                "nav-origins": "Ursprung", "nav-cv": "Chronik", "nav-academy": "Akademie", "nav-arsenal": "Arsenal", "nav-works": "Werke", "nav-contact": "Kontakt",
+                "hero-tag": "IT Operations • Projekt Management • Creative Technologist",
+                "hero-desc": "Die Brücke zwischen Unternehmensarchitektur und immersiver digitaler Kunst. Spezialisiert auf das Management performanter Digitalprojekte und kreativer Interfaces.",
+                "cv-title": "Die Chronik", "now": "HEUTE",
+                "job1-title": "Gründer & Lead Developer", "job1-desc": "Aufbau einer kreativen Digitalagentur...",
+                "job2-title": "Web Projekt Manager", "job2-desc": "Online-Strategien im Bereich e-Commerce.",
+                "job3-title": "Web Business Manager", "job3-desc": "Zuständig für IT-Infrastruktur und E-Commerce.",
+                "job4-title": "IT Support Manager", "job4-desc": "IT-Support für Module & Shop2Go Systeme.",
+                "job5-title": "Operation System Coordinator", "job5-desc": "IT-Support & Koordination für VW & Audi.",
+                "job6-title": "Eigentümer", "job6-desc": "Lokale Zeitung in Südafrika.",
+                "job7-title": "Soldat auf Zeit", "job7-desc": "Stabsdienst im Personalwesen beim Hubschrauberregiment 10.",
+                "edu1-title": "Web Business Management", "edu1-inst": "Diploma, Webmasters Europe e.V.", "edu1-desc": "Diploma Abschlussarbeit in Web Business Management.",
+                "edu2-title": "Online Marketing Manager", "edu2-inst": "Zertifikat, Webmasters Europe e.V.", "edu2-desc": "Online Marketing & Web Analytics.",
+                "edu3-title": "Web Interface Designer", "edu3-inst": "Zertifikat, Webmasters Europe e.V.", "edu3-desc": "Web Interface Design & Usability.",
+                "nav-academy": "Akademie", "skill-cat1": "Creative Technologist", "skill-cat2": "Management & Ops", "skill-cat3": "Design & Commerce", "skill-cat4": "Legacy & Artifacts",
+                "works-title": "Werke", "proj1-desc": "3D UI Framework basierend auf R3F.", "proj2-desc": "Dashboard-Konzept für Automotive.",
+                "contact-tag": "Verbindung aufnehmen", "form-name": "Name", "form-email": "Email", "form-message": "Nachricht", "form-send": "Signal senden", "form-success": "Nachricht durch die Leere übertragen", "footer-suffix": "IN DER LEERE GESCHMIEDET"
+            }
+        };
+
+        let currentLang = 'en';
+        let isDarkMode = true;
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const feedback = document.getElementById('form-feedback');
+            const form = document.getElementById('contact-form');
+            const btn = document.getElementById('sendBtn');
+            btn.innerText = currentLang === 'en' ? 'Transmitting...' : 'Wird übertragen...';
+            btn.disabled = true;
+            setTimeout(() => {
+                feedback.classList.remove('hidden');
+                form.reset();
+                btn.innerText = translations[currentLang]["form-send"];
+                btn.disabled = false;
+                setTimeout(() => feedback.classList.add('hidden'), 5000);
+            }, 1500);
+        }
+
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const particleCount = 200;
+        const mouse = { x: null, y: null, radius: 120 };
+        window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
+        window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedY = Math.random() * -0.6 - 0.2;
+                this.speedX = Math.random() * 0.4 - 0.2;
+                this.opacity = Math.random() * 0.6 + 0.1;
+                this.fadeSpeed = Math.random() * 0.005 + 0.002;
+            }
+            update() {
+                if (mouse.x !== null && mouse.y !== null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        this.x -= (dx / distance) * ((mouse.radius - distance) / mouse.radius) * 5;
+                        this.y -= (dy / distance) * ((mouse.radius - distance) / mouse.radius) * 5;
+                    }
+                }
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.opacity -= this.fadeSpeed;
+                if (this.opacity <= 0 || this.y < -10) { this.reset(); this.y = canvas.height + 10; }
+            }
+            draw() {
+                const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+                ctx.fillStyle = accentColor; ctx.globalAlpha = this.opacity;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            particles = [];
+            for (let i = 0; i < particleCount; i++) { particles.push(new Particle()); }
+        }
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
+        }
+        window.addEventListener('resize', initParticles);
+        initParticles(); animateParticles();
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('light-mode');
+            const sunIcon = `<path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>`;
+            const moonIcon = `<path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>`;
+            document.getElementById('theme-icon').innerHTML = isDarkMode ? moonIcon : sunIcon;
+            document.getElementById('theme-icon-mobile').innerHTML = isDarkMode ? moonIcon : sunIcon;
+        }
+
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            document.getElementById("scroll-progress").style.width = (winScroll / height) * 100 + "%";
+            const btt = document.getElementById("back-to-top");
+            if (winScroll > 300) btt.classList.add("visible"); else btt.classList.remove("visible");
+        };
+
+        function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        function updateLanguage() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
+            });
+            document.getElementById('langBtn').innerText = currentLang === 'en' ? 'DE' : 'EN';
+            document.getElementById('langBtnMobile').innerText = currentLang === 'en' ? 'DE' : 'EN';
+        }
+        function toggleLanguage() { currentLang = currentLang === 'en' ? 'de' : 'en'; updateLanguage(); }
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            menu.classList.toggle('active');
+            icon.innerHTML = menu.classList.contains('active') ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>' : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>';
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const layers = document.querySelectorAll('.layer');
+            const x = (window.innerWidth - e.clientX * 0.02) / 100;
+            const y = (window.innerHeight - e.clientY * 0.02) / 100;
+            layers.forEach(l => l.style.transform = `translateX(${x}px) translateY(${y}px)`);
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('section, header').forEach(el => {
+            el.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
+
