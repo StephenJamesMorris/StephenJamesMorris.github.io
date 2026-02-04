@@ -52,7 +52,7 @@
             transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        h1, h2, h3, .nav-item, .lang-toggle, .mobile-nav-item, .theme-toggle {
+        h1, h2, h3, .nav-item, .lang-toggle, .mobile-nav-item, .theme-toggle, .footer-brand {
             font-family: 'Cinzel', serif;
         }
 
@@ -166,7 +166,7 @@
         .profile-image-container img { width: 100%; height: auto; display: block; object-fit: cover; }
         .profile-image-container:hover { box-shadow: 0 0 40px var(--accent); transform: scale(1.02); }
 
-        .logo-img { height: 40px; width: auto; filter: drop-shadow(0 0 5px var(--accent-glow)); transition: all 0.3s ease; }
+        .logo-img { height: 42px; width: auto; filter: drop-shadow(0 0 5px var(--accent-glow)); transition: all 0.3s ease; }
         .group:hover .logo-img { transform: scale(1.1); filter: drop-shadow(0 0 10px var(--accent)); }
     </style>
 </head>
@@ -184,16 +184,18 @@
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
     </button>
 
-    <nav class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-5xl px-4">
-        <div class="glass-panel rounded-full px-6 md:px-8 py-2 md:py-3 flex items-center justify-between">
+    <!-- Navigation Bar -->
+    <nav class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-6xl px-6">
+        <div class="glass-panel rounded-full px-6 md:px-10 py-2.5 md:py-3.5 flex items-center justify-between">
             <div class="flex items-center">
                 <a href="#origins" class="outline-none group flex items-center gap-3">
-                    <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158861.svg" alt="Logo" class="logo-img">
-                    <div class="hidden sm:block text-sm font-bold tracking-[0.3em] uppercase text-[var(--text-main)] group-hover:text-[var(--accent)] transition-colors">sjm.dev</div>
+                    <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="logo-img">
+                    <!-- sjm.dev text is hidden on md screens (wide view) and up -->
+                    <div class="hidden sm:block md:hidden text-xl font-bold tracking-[0.2em] accent-glow">sjm.dev</div>
                 </a>
             </div>
 
-            <div class="hidden lg:flex gap-6 items-center">
+            <div class="hidden md:flex gap-8 items-center">
                 <a href="#origins" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-origins">Origins</a>
                 <a href="#about" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-about">About</a>
                 <a href="#cv" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-cv">Chronicle</a>
@@ -201,14 +203,20 @@
                 <a href="#arsenal" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-arsenal">Arsenal</a>
                 <a href="#projects" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-works">Works</a>
                 <a href="#contact" class="nav-item text-[10px] uppercase tracking-widest hover:opacity-70 transition-opacity" data-i18n="nav-contact">Contact</a>
-                <div class="h-4 w-[1px] bg-[var(--text-main)]/10 mx-1"></div>
-                <button onclick="toggleTheme()" class="theme-toggle p-2 hover:scale-110 transition-transform outline-none">
-                    <svg id="theme-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                </button>
-                <button onclick="toggleLanguage()" class="lang-toggle text-[10px] uppercase tracking-[0.2em] font-bold outline-none min-w-[30px]" id="langBtn">DE</button>
+
+                <div class="h-5 w-[1px] bg-white/10 mx-1"></div>
+
+                <div class="flex items-center gap-1.5">
+                    <button onclick="toggleTheme()" class="theme-toggle p-2 hover:scale-110 transition-transform outline-none">
+                        <svg id="theme-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                    </button>
+                    <button onclick="toggleLanguage()" class="lang-toggle text-[10px] uppercase tracking-[0.2em] font-bold outline-none min-w-[30px]" id="langBtn">DE</button>
+                </div>
             </div>
 
-            <div class="flex lg:hidden items-center gap-3">
+            <div class="flex md:hidden items-center gap-3">
                 <button onclick="toggleTheme()" class="p-2 outline-none"><svg id="theme-icon-mobile" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg></button>
                 <button onclick="toggleLanguage()" class="lang-toggle text-[10px] uppercase tracking-[0.2em] font-bold outline-none" id="langBtnMobile">DE</button>
                 <button onclick="toggleMobileMenu()" class="outline-none">
@@ -218,8 +226,8 @@
         </div>
     </nav>
 
-    <div id="mobile-menu" class="fixed inset-0 z-[90] flex flex-col items-center justify-center gap-8 lg:hidden text-center px-4">
-        <img src="https://github.com/StephenJamesMorris/1000158861.svg" alt="Logo" class="w-20 h-auto mb-8">
+    <div id="mobile-menu" class="fixed inset-0 z-[90] flex flex-col items-center justify-center gap-8 md:hidden text-center px-4">
+        <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="w-24 h-auto mb-8 accent-glow">
         <a href="#origins" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-origins">Origins</a>
         <a href="#about" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-about">About</a>
         <a href="#cv" onclick="toggleMobileMenu()" class="mobile-nav-item text-xl uppercase tracking-[0.3em]" data-i18n="nav-cv">Chronicle</a>
@@ -291,12 +299,15 @@
                     <p class="text-base leading-relaxed text-[var(--text-main)] font-medium mb-4" data-i18n="about-text-p1">
                         With over a decade of experience in IT operations and project management, I’ve navigated corporate environments while maintaining a deep passion for digital art.
                     </p>
+                    <p class="text-sm leading-relaxed text-[var(--text-muted)] font-semibold" data-i18n="about-text-p2">
+                        My work is driven by structural precision and creative exploration.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Chronicle -->
+    <!-- Chronicle Section -->
     <section id="cv" class="py-24 px-4 max-w-5xl mx-auto relative">
         <div class="flex items-center gap-4 mb-20 justify-center text-center">
             <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
@@ -369,7 +380,7 @@
         </div>
     </section>
 
-    <!-- Academy -->
+    <!-- Academy Section -->
     <section id="academy" class="py-24 px-4 max-w-6xl mx-auto relative">
         <div class="flex items-center gap-4 mb-20 justify-center text-center">
             <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
@@ -392,7 +403,7 @@
         </div>
     </section>
 
-    <!-- Arsenal -->
+    <!-- Arsenal Section -->
     <section id="arsenal" class="py-24 px-4 max-w-6xl mx-auto relative">
         <div class="flex items-center gap-4 mb-20 justify-center text-center">
             <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-50 flex-grow"></div>
@@ -428,14 +439,21 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer id="contact" class="py-24 px-4 text-center border-t border-[var(--glass-border)] bg-black/5">
+    <!-- Footer Section -->
+    <footer id="contact" class="py-32 px-4 text-center border-t border-[var(--glass-border)] bg-black/5">
         <a href="#origins" class="inline-block group mb-8">
-            <img src="https://github.com/StephenJamesMorris/1000158861.svg" alt="Logo Footer" class="w-16 h-auto mx-auto logo-img">
+            <img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" 
+                 alt="sjm logo" 
+                 class="h-24 md:h-32 w-auto mx-auto drop-shadow-2xl transition-all duration-500 group-hover:scale-110">
         </a>
-        <div class="text-2xl font-bold tracking-[0.4em] text-[var(--accent)] mb-8">SJM.DEV</div>
+        
+        <div class="footer-brand text-3xl md:text-5xl font-bold tracking-[0.6em] text-[var(--accent)] mb-12 uppercase italic transform -translate-y-2">
+            SJM.DEV
+        </div>
+
         <div class="flex flex-wrap justify-center gap-6 md:gap-10 mb-12">
-            <a href="https://github.com/StephenJamesMorris" target="_blank" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2">
+            <!-- Updated Social Links -->
+            <a href="https://stephenjamesmorris.github.io" target="_blank" class="social-link uppercase text-[10px] md:text-xs tracking-widest font-bold flex items-center gap-2">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                 <span>GitHub</span>
             </a>
@@ -459,7 +477,10 @@
                 "about-title": "The Essence", "about-job-title": "Web Business Manager",
                 "about-label-name": "Name", "about-label-dob": "Birth", "about-label-address": "Address", "about-label-nat": "Nationality", "about-label-mobile": "Mobile", "about-label-email": "Email",
                 "about-val-nat": "German", "about-text-p1": "With over a decade of experience in IT operations and project management, I’ve navigated corporate environments while maintaining a deep passion for digital art.",
-                "cv-title": "The Chronicle", "job1-title": "Founder & Lead Developer", "job2-title": "Web Projekt Manager", "footer-suffix": "FORGED IN THE VOID"
+                "about-text-p2": "My work is driven by structural precision and creative exploration.",
+                "cv-title": "The Chronicle", "job1-title": "Founder & Lead Developer", "job2-title": "Web Projekt Manager",
+                "skill-cat1": "Creative Technologist", "skill-cat2": "Management & Ops", "skill-cat3": "Design & Commerce", "skill-cat4": "Legacy & Artifacts",
+                "footer-suffix": "FORGED IN THE VOID"
             },
             de: {
                 "nav-origins": "Ursprung", "nav-about": "Über mich", "nav-cv": "Chronik", "nav-academy": "Akademie", "nav-arsenal": "Arsenal", "nav-works": "Werke", "nav-contact": "Kontakt",
@@ -467,7 +488,10 @@
                 "about-title": "Die Essenz", "about-job-title": "Web Business Manager",
                 "about-label-name": "Name", "about-label-dob": "Geburtsdatum", "about-label-address": "Adresse", "about-label-nat": "Nationalität", "about-label-mobile": "Mobil", "about-label-email": "Email",
                 "about-val-nat": "deutsch", "about-text-p1": "Mit über einem Jahrzehnt Erfahrung in IT-Operations und Projektmanagement habe ich Unternehmensumgebungen navigiert, während ich stets meine Leidenschaft für digitale Kunst bewahrt habe.",
-                "cv-title": "Die Chronik", "job1-title": "Gründer & Lead Developer", "job2-title": "Web Projekt Manager", "footer-suffix": "IN DER LEERE GESCHMIEDET"
+                "about-text-p2": "Meine Arbeit wird durch strukturelle Präzision und kreative Exploration angetrieben.",
+                "cv-title": "Die Chronik", "job1-title": "Gründer & Lead Developer", "job2-title": "Web Projekt Manager",
+                "skill-cat1": "Creative Technologist", "skill-cat2": "Management & Ops", "skill-cat3": "Design & Commerce", "skill-cat4": "Legacy & Artifacts",
+                "footer-suffix": "IN DER LEERE GESCHMIEDET"
             }
         };
 
@@ -542,6 +566,7 @@
             const sunIcon = `<path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" />`;
             const moonIcon = `<path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>`;
             document.getElementById('theme-icon').innerHTML = isDarkMode ? moonIcon : sunIcon;
+            document.getElementById('theme-icon-mobile').innerHTML = isDarkMode ? moonIcon : sunIcon;
         }
 
         function toggleLanguage() { currentLang = currentLang === 'en' ? 'de' : 'en'; updateLanguage(); }
@@ -570,6 +595,19 @@
         document.querySelectorAll('section, header').forEach(el => {
             el.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10'); observer.observe(el);
         });
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('sendBtn');
+            btn.innerText = currentLang === 'en' ? 'Transmitting...' : 'Wird übertragen...';
+            btn.disabled = true;
+            setTimeout(() => {
+                document.getElementById('form-feedback').classList.remove('hidden');
+                btn.innerText = translations[currentLang]["form-send"];
+                btn.disabled = false;
+                setTimeout(() => document.getElementById('form-feedback').classList.add('hidden'), 5000);
+            }, 1500);
+        }
     </script>
 </body>
 </html>
