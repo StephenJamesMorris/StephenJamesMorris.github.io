@@ -661,7 +661,54 @@
         </section>
 
         <!-- Footer -->
-        <footer id="contact" class="py-32 px-4 text-center border-t border-[var(--glass-border)] bg-black/5">
+        <!-- Contact Form -->
+        <section id="contact" class="py-32 px-4 max-w-4xl mx-auto relative">
+            <div class="flex items-center gap-4 mb-20 justify-center text-center">
+                <div class="h-[1px] bg-gradient-to-r from-transparent to-[var(--accent)] opacity-40 flex-grow"></div>
+                <h2 class="text-2xl md:text-3xl uppercase tracking-[0.5em] font-bold" data-i18n="nav-contact">Contact</h2>
+                <div class="h-[1px] bg-gradient-to-l from-transparent to-[var(--accent)] opacity-40 flex-grow"></div>
+            </div>
+            
+            <div class="glass-card p-8 md:p-12 rounded-[2.5rem] text-left">
+                <form id="contact-form" name="contact" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" class="flex flex-col gap-6">
+                    <input type="hidden" name="form-name" value="contact" />
+                    <input type="hidden" name="subject" value="Freelance Questions from %{siteName}" />
+                    <p style="position: absolute; overflow: hidden; clip: rect(0 0 0 0); height: 1px; width: 1px; margin: -1px; padding: 0; border: 0">
+                        <label>Don’t fill this out if you're human: <input name="bot-field" /></label>
+                    </p>
+
+                    <div>
+                        <label for="name" class="block text-sm uppercase tracking-widest font-bold mb-2 text-[var(--text-muted)]" data-i18n="contact-name">Name</label>
+                        <input type="text" id="name" name="name" required class="w-full bg-black/20 border border-[var(--glass-border)] rounded-xl px-4 py-3 text-[var(--text-main)] outline-none focus:border-[var(--accent)] transition-colors">
+                        <span class="text-red-500 text-xs hidden mt-1" id="name-error" data-i18n="contact-error-name">Name is required</span>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm uppercase tracking-widest font-bold mb-2 text-[var(--text-muted)]" data-i18n="contact-email">Email</label>
+                        <input type="email" id="email" name="email" required class="w-full bg-black/20 border border-[var(--glass-border)] rounded-xl px-4 py-3 text-[var(--text-main)] outline-none focus:border-[var(--accent)] transition-colors">
+                        <span class="text-red-500 text-xs hidden mt-1" id="email-error" data-i18n="contact-error-email">Valid email is required</span>
+                    </div>
+
+                    <div>
+                        <label for="message" class="block text-sm uppercase tracking-widest font-bold mb-2 text-[var(--text-muted)]" data-i18n="contact-message">Message</label>
+                        <textarea id="message" name="message" required rows="5" class="w-full bg-black/20 border border-[var(--glass-border)] rounded-xl px-4 py-3 text-[var(--text-main)] outline-none focus:border-[var(--accent)] transition-colors resize-y"></textarea>
+                        <span class="text-red-500 text-xs hidden mt-1" id="message-error" data-i18n="contact-error-message">Message is required</span>
+                    </div>
+
+                    <div class="mt-4">
+                        <button type="submit" class="glass-panel w-full py-4 rounded-xl uppercase tracking-[0.2em] font-bold hover:bg-[var(--accent)] hover:text-white transition-all text-sm accent-glow" id="submit-btn" data-i18n="contact-submit">
+                            Send Message
+                        </button>
+                    </div>
+
+                    <div id="form-success" class="hidden text-center text-green-500 text-sm mt-4 font-bold tracking-widest" data-i18n="contact-success">Message sent successfully!</div>
+                    <div id="form-error" class="hidden text-center text-red-500 text-sm mt-4 font-bold tracking-widest" data-i18n="contact-error">Failed to send message. Please try again.</div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer id="footer-area" class="py-32 px-4 text-center border-t border-[var(--glass-border)] bg-black/5">
             <a href="#origins" class="inline-block group mb-8 transition-transform hover:scale-110"><img src="https://raw.githubusercontent.com/StephenJamesMorris/StephenJamesMorris.github.io/refs/heads/main/1000158290-removebg-preview.png" alt="sjm logo" class="h-24 md:h-32 w-auto mx-auto drop-shadow-2xl"></a>
             <div class="footer-brand text-3xl md:text-5xl font-bold tracking-[0.6em] text-[var(--accent)] mb-12 uppercase italic transform -translate-y-2 text-center">SJM.DEV</div>
             <div class="flex flex-wrap justify-center gap-6 md:gap-10 mb-12">
@@ -689,7 +736,8 @@
                 "edu4-title": "Web Architect", "edu4-sub": "Webmasters Europe e.V.", "edu4-desc": "Certification in Website Conception & Project Management.",
                 "edu5-title": "PrestaShop Developer", "edu5-sub": "PrestaShop S.A.", "edu5-desc": "Certified Level 1 Integrator.",
                 "edu6-title": "Verizon Enterprise Center", "edu6-sub": "Verizon Certification", "edu6-desc": "Verizon Enterprise Center Management.",
-                "footer-suffix": "FORGED IN THE VOID"
+                "footer-suffix": "FORGED IN THE VOID",
+                "contact-name": "Name", "contact-email": "Email", "contact-message": "Message", "contact-submit": "Send Message", "contact-success": "Message sent successfully!", "contact-error": "Failed to send message. Please try again.", "contact-error-name": "Name is required", "contact-error-email": "Valid email is required", "contact-error-message": "Message is required"
             },
             de: {
                 "nav-origins": "Ursprung", "nav-about": "Über mich", "nav-cv": "Chronik", "nav-academy": "Akademie", "nav-arsenal": "Arsenal", "nav-gallery": "Galerie", "nav-contact": "Kontakt",
@@ -705,7 +753,8 @@
                 "edu4-title": "Web Architect", "edu4-sub": "Webmasters Europe e.V.", "edu4-desc": "Zertifizierung in Website-Konzeption & Projektmanagement.",
                 "edu5-title": "PrestaShop Entwickler", "edu5-sub": "PrestaShop S.A.", "edu5-desc": "Developer & Integrator Level 1 Zertifizierung.",
                 "edu6-title": "Verizon Enterprise Center", "edu6-sub": "Verizon Zertifizierung", "edu6-desc": "Zertifizierung in Verizon Enterprise Center Management.",
-                "footer-suffix": "IN DER LEERE GESCHMIEDET"
+                "footer-suffix": "IN DER LEERE GESCHMIEDET",
+                "contact-name": "Name", "contact-email": "E-Mail", "contact-message": "Nachricht", "contact-submit": "Nachricht senden", "contact-success": "Nachricht erfolgreich gesendet!", "contact-error": "Fehler beim Senden. Bitte versuchen Sie es erneut.", "contact-error-name": "Name ist erforderlich", "contact-error-email": "Gültige E-Mail ist erforderlich", "contact-error-message": "Nachricht ist erforderlich"
             }
         };
 
@@ -891,6 +940,65 @@
             const rune = document.getElementById('parallax-rune');
             if (rune) { rune.style.transform = `translate(-50%, calc(-50% + ${winScroll * 0.12}px)) rotate(${winScroll * 0.05}deg)`; }
         };
+
+        const contactForm = document.getElementById("contact-form");
+        if (contactForm) {
+            contactForm.addEventListener("submit", function(e) {
+                e.preventDefault();
+                
+                document.getElementById("name-error").classList.add("hidden");
+                document.getElementById("email-error").classList.add("hidden");
+                document.getElementById("message-error").classList.add("hidden");
+                document.getElementById("form-success").classList.add("hidden");
+                document.getElementById("form-error").classList.add("hidden");
+                
+                let isValid = true;
+                const name = document.getElementById("name").value.trim();
+                const email = document.getElementById("email").value.trim();
+                const message = document.getElementById("message").value.trim();
+                const btn = document.getElementById("submit-btn");
+                
+                if (!name) {
+                    document.getElementById("name-error").classList.remove("hidden");
+                    isValid = false;
+                }
+                if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+                    document.getElementById("email-error").classList.remove("hidden");
+                    isValid = false;
+                }
+                if (!message) {
+                    document.getElementById("message-error").classList.remove("hidden");
+                    isValid = false;
+                }
+                
+                if (isValid) {
+                    btn.disabled = true;
+                    btn.style.opacity = "0.5";
+                    const formData = new FormData(contactForm);
+                    
+                    fetch("/", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams(formData).toString()
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            document.getElementById("form-success").classList.remove("hidden");
+                            contactForm.reset();
+                        } else {
+                            document.getElementById("form-error").classList.remove("hidden");
+                        }
+                    })
+                    .catch(error => {
+                        document.getElementById("form-error").classList.remove("hidden");
+                    })
+                    .finally(() => {
+                        btn.disabled = false;
+                        btn.style.opacity = "1";
+                    });
+                }
+            });
+        }
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('opacity-100', 'translate-y-0'); });
