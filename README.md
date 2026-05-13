@@ -78,4 +78,5 @@ A custom-built particle system that serves as the dynamic backdrop for the portf
 🚀 Usage
 
 Open index.html in any modern web browser. The system will automatically detect system theme preferences and initialize the loading sequence.
+
 Forged in the Void — 2026 Stephen James Morris
